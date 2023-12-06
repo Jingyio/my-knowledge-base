@@ -16,7 +16,7 @@ static ErrorCode ConfigHandler(CameraHandle handle, CameraConfig config)
     }
 
     if (config.Type == PHOTO) {
-        return ((NSCAM::CamCore*)handle.Unused)->TakePhoto("hello.bmp");
+        return ((NSCAM::CamCore*)handle.Unused)->TakePhoto(config.FilePath);
     }
 
     return OK;

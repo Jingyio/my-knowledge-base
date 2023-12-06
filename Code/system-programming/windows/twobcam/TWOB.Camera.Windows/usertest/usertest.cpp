@@ -70,6 +70,7 @@ int main()
 
             CameraConfig config2 = {
                 .Type = PHOTO,
+                .FilePath = "Suliko.bmp",
             };
             ret = ConfigureCamera(handle, config2);
         }
