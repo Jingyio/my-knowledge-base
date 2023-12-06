@@ -118,13 +118,18 @@ ErrorCode CamCore::StopPreview(void)
     return StopStreaming(mPreviewPinIndex);
 }
 
+static const char* sFileName = nullptr;
 ErrorCode CamCore::TakePhoto(const char* fileName)
 {
     ErrorCode res = OK;
+    sFileName = fileName;
 
     do {
         RegisterRenderCallback(this, mPhotoPinIndex, [](unsigned char* pBuf, MediaFormat format) -> void {
-            PhotoSink sink("1.bmp");
+            if (!sFileName)
+                sFileName = "unnamed.bmp";
+
+            PhotoSink sink(sFileName);
             unsigned char* pDest = new unsigned char[4 * 1024 * 1024];
 
             if (format.Format == NV12) {
@@ -136,6 +141,7 @@ ErrorCode CamCore::TakePhoto(const char* fileName)
             sink.LoadDataFromRGBA(pDest, format.Width, format.Height);
             sink.SaveFile(format.Width, format.Height);
 
+            sFileName = nullptr;
             delete[] pDest;
         });
 
@@ -323,6 +329,7 @@ ErrorCode CamCoreHelper::OnDataArrived(void* caller, int streamIndex, unsigned c
     }
 
     if (streamIndex == pCamCore->mPhotoPinIndex && pCamCore->mIsTakingPhoto) {
+        pCamCore->UnregisterRenderCallback(pCamCore, streamIndex);
         pCamCore->StopStreaming(pCamCore->mPhotoPinIndex);
         pCamCore->mIsTakingPhoto = false;
     }
