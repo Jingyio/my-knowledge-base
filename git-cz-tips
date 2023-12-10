@@ -1,0 +1,23 @@
+[folder] code/bare-metal-programming
+
+    x86_64-practices
+    x86_64-demo-os
+
+[folder] code/system-programming
+
+    win-practices
+    win-twobcam
+    linux-practices
+
+[folder] code/database
+
+    db-sql
+
+[folder] code/web
+
+    web-django
+
+[folder] hw
+
+    hw-multisim
+    hw-pcb
