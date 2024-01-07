@@ -11,8 +11,7 @@
 #include <vector>
 #include <map>
 #include <shared_mutex>
-#include "libifwin.h"
-#include "../libcore/libifcamcore.h"
+#include "../../libcore/libcamdef.h"
 
 class MediaSourceControl : public IMFSourceReaderCallback {
 public:
@@ -24,7 +23,7 @@ public:
     };
 
 public:
-    static MediaSourceControl* CreateInstance           (IMFActivate*);
+    static MediaSourceControl* CreateInstance           (unsigned int);
     explicit                   MediaSourceControl       (IMFActivate*);
                                ~MediaSourceControl      (void) = default;
 
@@ -57,6 +56,7 @@ public:
     static HRESULT             MapMFMediaType           (GUID, VideoFormat&);
 
     static std::mutex                                   sInstLock;
+    static IMFActivate**                                sMFActivates;
 
 protected:
     ULONG                                               mRefCount;

@@ -1,20 +1,52 @@
-#include "libsourcecontrolwin.h"
+#include "libsourcecontrol.h"
 #include <ks.h>
 #include <ksmedia.h>
 #include <mftransform.h>
 
+//mfplat.lib
+//mf.lib
+//mfreadwrite.lib
+//mfuuid.lib
+//d3d9.lib
+//shlwapi.lib
+
+#pragma comment(lib, "mfplat.lib")
+#pragma comment(lib, "mf.lib")
+#pragma comment(lib, "mfreadwrite.lib")
+#pragma comment(lib, "mfuuid.lib")
+
 std::mutex MediaSourceControl::sInstLock;
+IMFActivate** MediaSourceControl::sMFActivates;
 
 MediaSourceControl* MediaSourceControl::CreateInstance(
-	IMFActivate* pDevice
+	unsigned int cameraIndex
 )
 {
+	HRESULT result = S_OK;
+	UINT32 count = 0;
 	std::lock_guard<std::mutex> lock(sInstLock);
 
-	if (!pDevice)
-		return nullptr;
+	if (!sMFActivates) {
+		result = GetMFActivateCount(MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE,
+									MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID,
+									&count);
+		if (FAILED(result) || (cameraIndex >= count))
+			return nullptr;
 
-	return new MediaSourceControl(pDevice);
+		sMFActivates = new IMFActivate * [128];
+		memset(sMFActivates, 0, 128 * sizeof(IMFActivate*));
+
+		for (int i = 0; ; i++) {
+			result = MediaSourceControl::GetMFActivate(MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE,
+												       MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID,
+												       i,
+												       &sMFActivates[i]);
+			if (FAILED(result))
+				break;
+		}
+	}
+
+	return new MediaSourceControl(sMFActivates[cameraIndex]);
 }
 
 MediaSourceControl::MediaSourceControl(

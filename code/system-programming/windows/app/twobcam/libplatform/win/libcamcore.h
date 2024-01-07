@@ -1,18 +1,13 @@
 #ifndef _LIBCAMCORE_H_
 #define _LIBCAMCORE_H_
 
-#ifdef LIBCAMCORE_EXPORTS
-#define LIBCAMCORE_API __declspec(dllexport)
-#else
-#define LIBCAMCORE_API __declspec(dllimport)
-#endif
-
-#include "libifcamcore.h"
-#include "../libPlatform/libifwin.h"
-#include "libphotosink.h"
 #include <map>
 #include <mutex>
 #include <vector>
+#include <Windows.h>
+#include "libsourcecontrol.h"
+#include "../../libcore/libcamcoreif.h"
+#include "../../libcore/libphotosink.h"
 
 namespace NSCAM {
 
@@ -21,25 +16,24 @@ public:
     static ErrorCode OnDataArrived(void*, int, unsigned char*, MediaFormat);
 };
 
-class CamCore {
+class CamCore : public ICamCore {
     friend CamCoreHelper;
 
 public:
-    static CamCore* CreateInstance(unsigned int);
-              ~CamCore          (void);
+    explicit CamCore(unsigned int);
+    ~CamCore(void);
 
-    ErrorCode StartPreview      (RenderCallback);
-    ErrorCode StopPreview       (void);
-    ErrorCode TakePhoto         (const char*);
-    ErrorCode StartRecord       (const char*);
-    ErrorCode StopRecord        (void);
-    ErrorCode GetSupportedFormat(PinType, MediaFormat*, unsigned int*);
+    ErrorCode StartPreview      (RenderCallback) override;
+    ErrorCode StopPreview       (void) override;
+    ErrorCode TakePhoto         (const char*) override;
+    ErrorCode StartRecord       (const char*) override;
+    ErrorCode StopRecord        (void) override;
+    ErrorCode GetSupportedFormat(PinType, MediaFormat*, unsigned int*) override;
 
     static std::mutex           sMutex;
 
 
 private:
-    explicit  CamCore           (unsigned int);
     ErrorCode Initialize        (unsigned int);
     ErrorCode Release           (void);
     ErrorCode StartStreaming    (unsigned int);
@@ -53,10 +47,9 @@ private:
         RenderCallback Callback;
     };
 
-    PlatformHandle              mHandle;
-    int                         mPreviewPinIndex;
-    int                         mPhotoPinIndex;
-    int                         mRecordPinIndex;
+    DWORD                       mPreviewPinIndex;
+    DWORD                       mPhotoPinIndex;
+    DWORD                       mRecordPinIndex;
     std::mutex                  mMutex;
     std::map<int, unsigned int> mWorkingStreamRefCountMapper;
     std::vector<MediaFormat>    mPreviewSupportedFormat;
@@ -64,6 +57,7 @@ private:
     std::vector<MediaFormat>    mPhotoSupportedFormat;
     std::vector<RenderInfo>     mRenderInfoList;
     std::atomic_bool            mIsTakingPhoto;
+    MediaSourceControl*         mpMediaSourceControl;
 };
 
 }
