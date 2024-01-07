@@ -8,6 +8,9 @@ static ErrorCode ConfigHandler(CameraHandle handle, CameraConfig config)
         return INVALID_HANDLE;
 
     if (config.Type == PREVIEW) {
+        if (config.FormatIndex != -1)
+            ((NSCAM::ICamCore*)handle.Unused)->SetCurrentFormat(PinType::PREVIEW, config.FormatIndex);
+
         if (config.Action == START)
             return ((NSCAM::ICamCore*)handle.Unused)->StartPreview(config.Callback);
         else if (config.Action == STOP)
@@ -15,6 +18,9 @@ static ErrorCode ConfigHandler(CameraHandle handle, CameraConfig config)
     }
 
     if (config.Type == PHOTO) {
+        if (config.FormatIndex != -1)
+            ErrorCode res = ((NSCAM::ICamCore*)handle.Unused)->SetCurrentFormat(PinType::PHOTO, config.FormatIndex);
+
         return ((NSCAM::ICamCore*)handle.Unused)->TakePhoto(config.FilePath);
     }
 
@@ -34,6 +40,13 @@ static ErrorCode InfoHandler(CameraHandle handle, CameraInfo& info)
     info.PreviewFormatCount = 0;
     info.RecordFormatCount = 0;
     info.PhotoFormatCount = 0;
+
+    if (pCamCore->GetCurrentFormat(PinType::PREVIEW, &info.CurrentPreviewFormat))
+        memset(&info.CurrentPreviewFormat, 0, sizeof(MediaFormat));
+    if (pCamCore->GetCurrentFormat(PinType::RECORD, &info.CurrentRecordFormat))
+        memset(&info.CurrentRecordFormat, 0, sizeof(MediaFormat));
+    if (pCamCore->GetCurrentFormat(PinType::PHOTO, &info.CurrentPhotoFormat))
+        memset(&info.CurrentPhotoFormat, 0, sizeof(MediaFormat));
 
     // Get supported media formats for each pin
     ErrorCode previewRes = pCamCore->GetSupportedFormat(PREVIEW, info.PreviewFormatArray, &info.PreviewFormatCount);

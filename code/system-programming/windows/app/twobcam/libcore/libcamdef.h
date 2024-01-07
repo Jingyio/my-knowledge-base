@@ -25,10 +25,12 @@ typedef enum LIBCAM_API {
 } VideoFormat;
 
 typedef struct LIBCAM_API {
-    VideoFormat Format;
+    VideoFormat  Format;
     unsigned int Width;
     unsigned int Height;
-    long Stride;
+    long         Stride;
+    unsigned int FrameNumerator;
+    unsigned int FrameDenominator;
 } MediaFormat;
 
 typedef LIBCAM_API enum {
@@ -46,11 +48,12 @@ typedef LIBCAM_API enum {
 typedef void LIBCAM_API(*RenderCallback)(unsigned char*, MediaFormat);
 typedef ErrorCode(*PinDataCallback)(void*, int, unsigned char*, MediaFormat);
 
-typedef struct LIBCAM_API {
-    PinType        Type;
-    ActionType     Action;
-    RenderCallback Callback;
-    const char* FilePath;
+typedef struct LIBCAM_API _CameraConfig {
+    PinType         Type;
+    int             FormatIndex = -1;
+    ActionType      Action;
+    RenderCallback  Callback;
+    const char*     FilePath;
 } CameraConfig;
 
 #define MAX_FORMAT_SIZE (128)
@@ -61,6 +64,9 @@ typedef struct LIBCAM_API {
     unsigned int PreviewFormatCount;
     unsigned int RecordFormatCount;
     unsigned int PhotoFormatCount;
+    MediaFormat  CurrentPreviewFormat;
+    MediaFormat  CurrentRecordFormat;
+    MediaFormat  CurrentPhotoFormat;
 } CameraInfo;
 
 #endif
