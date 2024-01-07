@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <string>
 #include <fstream>
-#include "libifcamcore.h"
+#include "libcamdef.h"
 
 class Bmp {
 public:
