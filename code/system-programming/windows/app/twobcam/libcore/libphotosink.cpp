@@ -190,31 +190,6 @@ void Bmp::Close(void)
         mFileStream.close();
 }
 
-int main(int argc, char* argv[])
-{
-    Bmp bmp("unname.bmp");
-    uint32_t width = 1024;
-    uint32_t height = 1024;
-    uint8_t r = 199;
-    uint8_t g = 237;
-    uint8_t b = 204;
-
-    bmp.CreateFile("test.bmp");
-
-    for (uint32_t i = 0; i < width; i++) {
-        for (uint32_t j = 0; j < height; j++) {
-            bmp << r;
-            bmp << g;
-            bmp << b;
-        }
-    }
-
-    bmp.Save(width, height);
-    bmp.Close();
-
-    return 0;
-}
-
 PhotoSink::PhotoSink(std::string fileName)
     : mBmp("")
 {

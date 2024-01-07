@@ -23,12 +23,14 @@ public:
     explicit CamCore(unsigned int);
     ~CamCore(void);
 
-    ErrorCode StartPreview      (RenderCallback) override;
-    ErrorCode StopPreview       (void) override;
-    ErrorCode TakePhoto         (const char*) override;
-    ErrorCode StartRecord       (const char*) override;
-    ErrorCode StopRecord        (void) override;
-    ErrorCode GetSupportedFormat(PinType, MediaFormat*, unsigned int*) override;
+    ErrorCode StartPreview      (RenderCallback)                        override;
+    ErrorCode StopPreview       (void)                                  override;
+    ErrorCode TakePhoto         (const char*)                           override;
+    ErrorCode StartRecord       (const char*)                           override;
+    ErrorCode StopRecord        (void)                                  override;
+    ErrorCode GetSupportedFormat(PinType, MediaFormat*, unsigned int*)  override;
+    ErrorCode GetCurrentFormat  (PinType, MediaFormat*)                 override;
+    ErrorCode SetCurrentFormat  (PinType, unsigned int)                 override;
 
     static std::mutex           sMutex;
 
@@ -42,9 +44,9 @@ private:
     ErrorCode UnregisterRenderCallback(void*, unsigned int);
 
     struct RenderInfo {
-        unsigned int StreamIndex;
-        void* Caller;
-        RenderCallback Callback;
+        unsigned int    StreamIndex;
+        void*           Caller;
+        RenderCallback  Callback;
     };
 
     DWORD                       mPreviewPinIndex;

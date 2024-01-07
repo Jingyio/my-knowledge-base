@@ -3,13 +3,6 @@
 #include <ksmedia.h>
 #include <mftransform.h>
 
-//mfplat.lib
-//mf.lib
-//mfreadwrite.lib
-//mfuuid.lib
-//d3d9.lib
-//shlwapi.lib
-
 #pragma comment(lib, "mfplat.lib")
 #pragma comment(lib, "mf.lib")
 #pragma comment(lib, "mfreadwrite.lib")
@@ -293,7 +286,12 @@ HRESULT MediaSourceControl::GetAvaliableMediaFormat(
 	if (FAILED(res))
 		return res;
 
-	return MFGetAttributeSize(pMFMediaType, MF_MT_FRAME_SIZE, &mediaType.Width, &mediaType.Height);
+	res = MFGetAttributeSize(pMFMediaType, MF_MT_FRAME_SIZE, &mediaType.Width, &mediaType.Height);
+	if (FAILED(res))
+		return res;
+
+	res = MFGetAttributeSize(pMFMediaType, MF_MT_FRAME_RATE, &mediaType.FrameNumerator, &mediaType.FrameDenominator);
+	return res;
 }
 
 HRESULT MediaSourceControl::GetCurrentMediaFormat(

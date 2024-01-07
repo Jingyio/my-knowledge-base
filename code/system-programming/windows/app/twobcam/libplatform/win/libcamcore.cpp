@@ -140,7 +140,7 @@ ErrorCode CamCore::TakePhoto(const char* fileName)
                 sFileName = "unnamed.bmp";
 
             PhotoSink sink(sFileName);
-            unsigned char* pDest = new unsigned char[4 * 1024 * 1024];
+            unsigned char* pDest = new unsigned char[4 * 2000 * 2000];
 
             if (format.Format == NV12) {
                 NV12toRGBA(pBuf, format.Width, format.Height, format.Stride, pDest);
@@ -204,6 +204,67 @@ ErrorCode CamCore::GetSupportedFormat(PinType pinType, MediaFormat* pDest, unsig
     *pCount = (unsigned int)pSource->size();
 
     return OK;
+}
+
+ErrorCode CamCore::GetCurrentFormat(PinType pinType, MediaFormat* pFormat)
+{
+    DWORD pin = 0;
+
+    if (!mpMediaSourceControl)
+        return ErrorCode::UNINITIALIZED;
+    if (!pFormat)
+        return ErrorCode::INVALID_PARAM;
+
+    std::lock_guard<std::mutex> lock(mMutex);
+
+    switch (pinType)
+    {
+    case PinType::RECORD:
+        pin = mRecordPinIndex;
+        break;
+    case PinType::PHOTO:
+        pin = mPhotoPinIndex;
+        break;
+    case PinType::PREVIEW:
+    default:
+        pin = mPreviewPinIndex;
+        break;
+    }
+
+    if (SUCCEEDED(mpMediaSourceControl->GetCurrentMediaFormat(pin, *pFormat)))
+        return ErrorCode::OK;
+    else
+        return ErrorCode::Error;
+}
+
+ErrorCode CamCore::SetCurrentFormat(PinType pinType, unsigned int typeIndex)
+{
+    DWORD pin = 0;
+
+    if (!mpMediaSourceControl)
+        return ErrorCode::UNINITIALIZED;
+
+    std::lock_guard<std::mutex> lock(mMutex);
+
+    switch (pinType)
+    {
+    case PinType::RECORD:
+        pin = mRecordPinIndex;
+        break;
+    case PinType::PHOTO:
+        pin = mPhotoPinIndex;
+        break;
+    case PinType::PREVIEW:
+    default:
+        pin = mPreviewPinIndex;
+        break;
+    }
+
+    if (SUCCEEDED(mpMediaSourceControl->SetCurrentMediaFormat(pin, typeIndex)))
+        return ErrorCode::OK;
+    else
+        return ErrorCode::Error;
+
 }
 
 ErrorCode CamCore::StartStreaming(unsigned int streamIndex)
