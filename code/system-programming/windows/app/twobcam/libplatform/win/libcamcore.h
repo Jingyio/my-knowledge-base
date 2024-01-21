@@ -8,12 +8,14 @@
 #include "libsourcecontrol.h"
 #include "../../libcore/libcamcoreif.h"
 #include "../../libcore/libphotosink.h"
+#include "libcamvideosink.h"
 
 namespace NSCAM {
 
 class CamCoreHelper {
 public:
     static ErrorCode OnDataArrived(void*, int, unsigned char*, MediaFormat);
+    static ErrorCode OnSampleArrived(void*, int, IMFSample*, LONGLONG);
 };
 
 class CamCore : public ICamCore {
@@ -59,7 +61,9 @@ private:
     std::vector<MediaFormat>    mPhotoSupportedFormat;
     std::vector<RenderInfo>     mRenderInfoList;
     std::atomic_bool            mIsTakingPhoto;
+    std::atomic_bool            mIsRecording;
     MediaSourceControl*         mpMediaSourceControl;
+    std::shared_ptr<VideoSinker> mpViderSinker;
 };
 
 }

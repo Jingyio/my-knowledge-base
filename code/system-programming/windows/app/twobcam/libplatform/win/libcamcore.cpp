@@ -60,6 +60,10 @@ ErrorCode CamCore::Initialize(unsigned int cameraIndex)
     if (FAILED(res))
         return Error;
 
+    res = mpMediaSourceControl->SetPinSampleCallback(this, CamCoreHelper::OnSampleArrived);
+    if (FAILED(res))
+        return Error;
+
     if (FAILED(mpMediaSourceControl->GetPreviewPinIndex(mPreviewPinIndex)))
         mPreviewPinIndex = 0;
     if (FAILED(mpMediaSourceControl->GetRecordPinIndex(mRecordPinIndex)))
@@ -102,8 +106,10 @@ ErrorCode CamCore::Initialize(unsigned int cameraIndex)
 
 ErrorCode CamCore::Release(void)
 {
-    if (mpMediaSourceControl)
+    if (mpMediaSourceControl) {
         mpMediaSourceControl->ClearPinDataCallback(this);
+        mpMediaSourceControl->ClearPinSampleCallback(this);
+    }
 
     return OK;
 }
@@ -135,7 +141,9 @@ ErrorCode CamCore::TakePhoto(const char* fileName)
     sFileName = fileName;
 
     do {
-        RegisterRenderCallback(&mPhotoPinIndex, mPhotoPinIndex, [](unsigned char* pBuf, MediaFormat format) -> void {
+        RegisterRenderCallback(&mPhotoPinIndex,
+                               mPhotoPinIndex,
+                               [](unsigned char* pBuf, MediaFormat format) -> void {
             if (!sFileName)
                 sFileName = "unnamed.bmp";
 
@@ -162,14 +170,51 @@ ErrorCode CamCore::TakePhoto(const char* fileName)
     TRACE_AND_RETURN(ret);
 }
 
-ErrorCode CamCore::StartRecord(const char*)
+ErrorCode CamCore::StartRecord(const char* pFileName)
 {
-    return OK;
+    HRESULT result = S_OK;
+
+    if (!mpMediaSourceControl)
+        return ErrorCode::UNINITIALIZED;
+
+    {
+        std::lock_guard<std::mutex> lock(mMutex);
+        mpViderSinker = nullptr;
+        mpViderSinker = std::make_shared<VideoSinker>();
+    }
+
+    if (mpViderSinker) {
+        CComPtr<IMFMediaType> pMediaType = nullptr;
+
+        StartStreaming(mRecordPinIndex);
+        std::lock_guard<std::mutex> lock(mMutex);
+
+        result = mpMediaSourceControl->GetCurrentMediaType(mRecordPinIndex, &pMediaType);
+        if (FAILED(result))
+            return ErrorCode::Error;
+
+        mpViderSinker->Start(L"test.wmv", pMediaType) == S_OK ? ErrorCode::OK : ErrorCode::Error;
+        mIsRecording = true;
+    }
+
+    return ErrorCode::OK;
 }
 
 ErrorCode CamCore::StopRecord(void)
 {
-    return OK;
+    HRESULT result = S_OK;
+
+    if (!mpViderSinker)
+        return ErrorCode::OK;
+
+    result = mpViderSinker->Stop();
+    if (SUCCEEDED(result)) {
+        std::lock_guard<std::mutex> lock(mMutex);
+        mIsRecording = false;
+    }
+
+    StopStreaming(mRecordPinIndex);
+    return ErrorCode::OK;
 }
 
 ErrorCode CamCore::GetSupportedFormat(PinType pinType, MediaFormat* pDest, unsigned int* pCount)
@@ -216,7 +261,7 @@ ErrorCode CamCore::GetCurrentFormat(PinType pinType, MediaFormat* pFormat)
         return ErrorCode::INVALID_PARAM;
 
     std::lock_guard<std::mutex> lock(mMutex);
-
+    
     switch (pinType)
     {
     case PinType::RECORD:
@@ -318,11 +363,22 @@ ErrorCode CamCore::StopStreaming(unsigned int streamIndex)
         if (item->second <= 0) {
             mWorkingStreamRefCountMapper.erase(item);
 
-            res = mpMediaSourceControl->SetStreamState(streamIndex, false);
-            if (FAILED(res)) {
-                ret = Error;
-                break;
-            }
+            int retryCount = 0;
+            do {
+                BOOL isRunning = FALSE;
+                
+                res = mpMediaSourceControl->GetStreamState(streamIndex, isRunning);
+                if (FAILED(res) || isRunning == FALSE)
+                    break;
+
+                res = mpMediaSourceControl->SetStreamState(streamIndex, false);
+                if (FAILED(res)) {
+                    retryCount++;
+                    Log::GetInstance().Fail("retry %d times\n", retryCount);
+                    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                }
+
+            } while (FAILED(res));
         }
 
     } while (0);
@@ -381,7 +437,7 @@ ErrorCode CamCore::UnregisterRenderCallback(void* caller, unsigned int streamInd
 ErrorCode CamCoreHelper::OnDataArrived(void* caller, int streamIndex, unsigned char* pBuf, MediaFormat format)
 {
     if (!caller || !pBuf)
-        return INVALID_PARAM;
+        return ErrorCode::INVALID_PARAM;
 
     CamCore* pCamCore = static_cast<CamCore*>(caller);
 
@@ -398,5 +454,18 @@ ErrorCode CamCoreHelper::OnDataArrived(void* caller, int streamIndex, unsigned c
     }
 
     return OK;
+}
+
+ErrorCode CamCoreHelper::OnSampleArrived(void* caller, int streamIndex, IMFSample* pSample, LONGLONG timestamp)
+{
+    if (!caller || !pSample)
+        return ErrorCode::INVALID_PARAM;
+
+    CamCore* pCamCore = static_cast<CamCore*>(caller);
+    if (streamIndex == pCamCore->mRecordPinIndex && pCamCore->mIsRecording) {
+        pCamCore->mpViderSinker->Write(pSample, timestamp);
+    }
+
+    return ErrorCode::OK;
 }
 }

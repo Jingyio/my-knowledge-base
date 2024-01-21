@@ -4,6 +4,7 @@
 #include "../../libCore/liblog.h"
 #include "../../libCore/libcamhalif.h"
 #include "../../libCore/libcamdef.h"
+#include <Windows.h>
 
 CameraHandle handle = { 0 };
 
@@ -92,10 +93,24 @@ int main()
 
             CameraConfig config2 = {
                 .Type = PHOTO,
-                .FormatIndex = 84,
+                .FormatIndex = 2,
                 .FilePath = "Suliko.bmp",
             };
             ret = ConfigureCamera(handle, config2);
+
+            CameraConfig config3 = {
+                .Type = RECORD,
+                .Action = START,
+            };
+            ret = ConfigureCamera(handle, config3);
+
+            Sleep(5000);
+
+            CameraConfig config4 = {
+                .Type = RECORD,
+                .Action = STOP,
+            };
+            ret = ConfigureCamera(handle, config4);
         }
     }
 

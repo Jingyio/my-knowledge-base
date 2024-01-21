@@ -11,7 +11,10 @@
 #include <vector>
 #include <map>
 #include <shared_mutex>
+#include <set>
 #include "../../libcore/libcamdef.h"
+
+typedef ErrorCode(*PinSampleCallback)(void*, int, IMFSample*, LONGLONG);
 
 class MediaSourceControl : public IMFSourceReaderCallback {
 public:
@@ -38,14 +41,17 @@ public:
     HRESULT                    OnEvent                  (DWORD, IMFMediaEvent*);
 
     /* Exported API */
-    /* TODO: Make them platform independent */
     HRESULT                    GetMFActivateSymbolicLink(LPWSTR*, UINT32*);
     HRESULT                    GetAvaliableMediaFormat  (DWORD, DWORD, MediaFormat&);
     HRESULT                    SetCurrentMediaFormat    (DWORD, DWORD);
     HRESULT                    GetCurrentMediaFormat    (DWORD, MediaFormat&);
-    HRESULT                    SetStreamState           (DWORD, bool);
-    HRESULT                    SetPinDataCallback       (void*, PinDataCallback cb);
+    HRESULT                    GetCurrentMediaType      (DWORD, IMFMediaType**);
+    HRESULT                    SetStreamState           (DWORD, BOOL);
+    HRESULT                    GetStreamState           (DWORD, BOOL&);
+    HRESULT                    SetPinDataCallback       (void*, PinDataCallback);
+    HRESULT                    SetPinSampleCallback     (void*, PinSampleCallback);
     HRESULT                    ClearPinDataCallback     (void*);
+    HRESULT                    ClearPinSampleCallback   (void*);
     HRESULT                    GetPreviewPinIndex       (DWORD&);
     HRESULT                    GetPhotoPinIndex         (DWORD&);
     HRESULT                    GetRecordPinIndex        (DWORD&);
@@ -67,6 +73,8 @@ protected:
     std::map<unsigned int, PinType>                     mPinTypeMap;
     std::map<unsigned int, MediaFormat>                 mPinFormatMap;
     std::vector<std::pair<void*, PinDataCallback>>      mPinDataCallbackList;
+    std::vector<std::pair<void*, PinSampleCallback>>    mPinSampleCallbackList;
+    std::set<DWORD>                                     mWorkingPins;
     int                                                 mDefaultPreviewPin;
     int                                                 mDefaultRecordPin;
     int                                                 mDefaultPhotoPin;

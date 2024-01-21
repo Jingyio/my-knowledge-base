@@ -24,6 +24,16 @@ static ErrorCode ConfigHandler(CameraHandle handle, CameraConfig config)
         return ((NSCAM::ICamCore*)handle.Unused)->TakePhoto(config.FilePath);
     }
 
+    if (config.Type == RECORD) {
+        if (config.FormatIndex != -1)
+            ErrorCode res = ((NSCAM::ICamCore*)handle.Unused)->SetCurrentFormat(PinType::PHOTO, config.FormatIndex);
+
+        if (config.Action == START)
+            return ((NSCAM::ICamCore*)handle.Unused)->StartRecord(config.FilePath);
+        else if (config.Action == STOP)
+            return ((NSCAM::ICamCore*)handle.Unused)->StopRecord();
+    }
+
     return OK;
 }
 

@@ -198,14 +198,23 @@ PhotoSink::PhotoSink(std::string fileName)
 
 void PhotoSink::LoadDataFromRGBA(unsigned char* pBuf, unsigned int width, unsigned int height)
 {
-    for (unsigned int i = 0; i < width; i++) {
-        for (unsigned int j = 0; j < height; j++) {
-            mBmp << pBuf[0];
-            mBmp << pBuf[1];
-            mBmp << pBuf[2];
+    pBuf += width * height * 4;
+    pBuf -= width * 4;
+
+    for (unsigned int i = 0; i < height; i++) {
+        for (unsigned int j = 0; j < width; j++) {
+            unsigned char r = pBuf[0];
+            unsigned char g = pBuf[1];
+            unsigned char b = pBuf[2];
+            unsigned char a = pBuf[3];
 
             pBuf += 4;
+
+            mBmp << r;
+            mBmp << g;
+            mBmp << b;
         }
+        pBuf -= width * 4 * 2;
     }
 }
 

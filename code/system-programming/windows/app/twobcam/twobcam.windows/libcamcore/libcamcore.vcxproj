@@ -168,6 +168,7 @@
     <ClInclude Include="..\..\libcore\liblog.h" />
     <ClInclude Include="..\..\libcore\libphotosink.h" />
     <ClInclude Include="..\..\libplatform\win\libcamcore.h" />
+    <ClInclude Include="..\..\libplatform\win\libcamvideosink.h" />
     <ClInclude Include="..\..\libplatform\win\libsourcecontrol.h" />
     <ClInclude Include="framework.h" />
   </ItemGroup>
@@ -177,6 +178,7 @@
     <ClCompile Include="..\..\libcore\liblog.cpp" />
     <ClCompile Include="..\..\libcore\libphotosink.cpp" />
     <ClCompile Include="..\..\libplatform\win\libcamcore.cpp" />
+    <ClCompile Include="..\..\libplatform\win\libcamvideosink.cpp" />
     <ClCompile Include="..\..\libplatform\win\libsourcecontrol.cpp" />
     <ClCompile Include="dllmain.cpp" />
   </ItemGroup>

@@ -214,12 +214,21 @@ HRESULT MediaSourceControl::OnReadSample(
 				p2DBuffer->Unlock2D();
 		}
 
+		if (SUCCEEDED(result) && pSample) {
+			for (auto& item : mPinSampleCallbackList) {
+				if (item.first == nullptr)
+					continue;
+
+				if (item.second) {
+					item.second(item.first, streamIndex, pSample, timestamp);
+				}
+			}
+		}
+
 	} while (0);
 
-	if (SUCCEEDED(res) && mpSourceReader) {
-		BOOL isRunning = false;
-		res = mpSourceReader->GetStreamSelection(streamIndex, &isRunning);
-		if (SUCCEEDED(res) && isRunning)
+	if (SUCCEEDED(result) && mpSourceReader) {
+		if (mWorkingPins.count(streamIndex) != 0)
 			res = mpSourceReader->ReadSample(streamIndex, 0, NULL, NULL, NULL, NULL);
 	}
 
@@ -322,6 +331,22 @@ HRESULT MediaSourceControl::GetCurrentMediaFormat(
 	return MFGetAttributeSize(pMFMediaType, MF_MT_FRAME_SIZE, &mediaType.Width, &mediaType.Height);
 }
 
+HRESULT MediaSourceControl::GetCurrentMediaType(
+	DWORD streamIndex,
+	IMFMediaType** ppMediaType
+)
+{
+	HRESULT res = S_OK;
+
+	if (!ppMediaType)
+		return E_POINTER;
+	if (!mpSourceReader)
+		return E_UNEXPECTED;
+
+	std::shared_lock<std::shared_mutex> rlock(mMutex);
+	return mpSourceReader->GetCurrentMediaType(streamIndex, ppMediaType);
+}
+
 HRESULT MediaSourceControl::SetCurrentMediaFormat(
 	DWORD streamIndex,
 	DWORD typeIndex
@@ -343,7 +368,7 @@ HRESULT MediaSourceControl::SetCurrentMediaFormat(
 
 HRESULT MediaSourceControl::SetStreamState(
 	DWORD streamIndex,
-	bool isSelected
+	BOOL isSelected
 )
 {
 	HRESULT res = S_OK;
@@ -352,7 +377,13 @@ HRESULT MediaSourceControl::SetStreamState(
 		return E_UNEXPECTED;
 
 	{
-		//std::unique_lock<std::shared_mutex> wlock(mMutex);
+		std::unique_lock<std::shared_mutex> wlock(mMutex);
+
+		if (isSelected)
+			mWorkingPins.insert(streamIndex);
+		else
+			mWorkingPins.erase(streamIndex);
+
 		res = mpSourceReader->SetStreamSelection(streamIndex, isSelected);
 		if (FAILED(res))
 			return res;
@@ -373,6 +404,15 @@ HRESULT MediaSourceControl::SetStreamState(
 	} else {
 		return res;
 	}
+}
+
+HRESULT MediaSourceControl::GetStreamState(
+	DWORD streamIndex,
+	BOOL& isSelected
+)
+{
+	std::shared_lock<std::shared_mutex> rlock(mMutex);
+	return mpSourceReader->GetStreamSelection(streamIndex, &isSelected);
 }
 
 HRESULT MediaSourceControl::SetPinDataCallback(
@@ -401,6 +441,32 @@ HRESULT MediaSourceControl::SetPinDataCallback(
 	return S_OK;
 }
 
+HRESULT MediaSourceControl::SetPinSampleCallback(
+	void* caller,
+	PinSampleCallback cb
+)
+{
+	if (!caller || !cb)
+		return E_POINTER;
+
+	bool isFound = false;
+
+	for (auto& item : mPinSampleCallbackList) {
+		// If the callback function has already been registered, update it
+		if (item.first == caller) {
+			isFound = true;
+			item.second = cb;
+			break;
+		}
+	}
+
+	if (!isFound) {
+		mPinSampleCallbackList.push_back(std::make_pair(caller, cb));
+	}
+
+	return S_OK;
+}
+
 HRESULT MediaSourceControl::ClearPinDataCallback(
 	void* caller
 )
@@ -410,6 +476,22 @@ HRESULT MediaSourceControl::ClearPinDataCallback(
 	for (auto item = mPinDataCallbackList.begin(); item != mPinDataCallbackList.end(); ) {
 		if (item->first == caller)
 			item = mPinDataCallbackList.erase(item);
+		else
+			item += 1;
+	}
+
+	return S_OK;
+}
+
+HRESULT MediaSourceControl::ClearPinSampleCallback(
+	void* caller
+)
+{
+	std::unique_lock<std::shared_mutex> wlock(mMutex);
+
+	for (auto item = mPinSampleCallbackList.begin(); item != mPinSampleCallbackList.end(); ) {
+		if (item->first == caller)
+			item = mPinSampleCallbackList.erase(item);
 		else
 			item += 1;
 	}
@@ -446,7 +528,6 @@ HRESULT MediaSourceControl::GetRecordPinIndex(DWORD& pinIndex)
 		return E_UNEXPECTED;
 	}
 }
-
 #pragma endregion
 
 #pragma region Helper function

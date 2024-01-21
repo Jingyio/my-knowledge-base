@@ -42,6 +42,9 @@
     <ClInclude Include="..\..\libcore\libcamdef.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\libplatform\win\libcamvideosink.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -63,6 +66,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libplatform\win\libsourcecontrol.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libplatform\win\libcamvideosink.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
