@@ -101,6 +101,7 @@ int main()
             CameraConfig config3 = {
                 .Type = RECORD,
                 .Action = START,
+                .FilePath = "new.wmv",
             };
             ret = ConfigureCamera(handle, config3);
 

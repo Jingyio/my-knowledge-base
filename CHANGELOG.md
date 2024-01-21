@@ -13,7 +13,8 @@
 ##### New Features
 
 * **win-app-twobcam:**
-  *  support video recording (4d3f15a1)
+  *  support saving videos with given file names (164d7b8b)
+  *  support video recording (f1363c61)
   *  support getting/setting media formats (8aa9be05)
   *  support saving captured photos with a given name (47893d44)
   *  create a twobcam project (a910ab2b)

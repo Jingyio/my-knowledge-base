@@ -193,7 +193,18 @@ ErrorCode CamCore::StartRecord(const char* pFileName)
         if (FAILED(result))
             return ErrorCode::Error;
 
-        mpViderSinker->Start(L"test.wmv", pMediaType) == S_OK ? ErrorCode::OK : ErrorCode::Error;
+        if (pFileName) {
+            int length = MultiByteToWideChar(CP_UTF8, 0, pFileName, -1, NULL, 0);
+            wchar_t* pWideString = (wchar_t*)malloc(length * sizeof(wchar_t));
+
+            MultiByteToWideChar(CP_UTF8, 0, pFileName, -1, pWideString, length);
+            if (pWideString)
+                mpViderSinker->Start(pWideString, pMediaType) == S_OK ? ErrorCode::OK : ErrorCode::Error;
+            free(pWideString);
+        } else {
+            mpViderSinker->Start(L"unamed.wmv", pMediaType) == S_OK ? ErrorCode::OK : ErrorCode::Error;
+        }
+
         mIsRecording = true;
     }
 
