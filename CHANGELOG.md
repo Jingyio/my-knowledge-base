@@ -1,4 +1,4 @@
-#### 2024-01-21
+#### 2024-01-31
 
 ##### Chores
 
@@ -13,7 +13,8 @@
 ##### New Features
 
 * **win-app-twobcam:**
-  *  support saving videos with given file names (164d7b8b)
+  *  create a UI project to support render preview data (e76c68b2)
+  *  support saving videos with given file names (ddf62cf6)
   *  support video recording (f1363c61)
   *  support getting/setting media formats (8aa9be05)
   *  support saving captured photos with a given name (47893d44)

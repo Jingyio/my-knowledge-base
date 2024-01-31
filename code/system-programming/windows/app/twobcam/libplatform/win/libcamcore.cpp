@@ -114,13 +114,34 @@ ErrorCode CamCore::Release(void)
     return OK;
 }
 
+static RenderCallback customRenderCb = nullptr;
 ErrorCode CamCore::StartPreview(RenderCallback cb)
 {
     ErrorCode res = OK;
 
+    // FIXME: Need to support multi-channel preview
+    customRenderCb = cb;
+
     do {
         // Register render callback
-        RegisterRenderCallback(&mPreviewPinIndex, mPreviewPinIndex, cb);
+        RegisterRenderCallback(&mPreviewPinIndex,
+                               mPreviewPinIndex,
+                               [](unsigned char* pBuf, MediaFormat format) -> void {
+
+            unsigned char* pDest = new unsigned char[4 * 2000 * 2000];
+
+            if (format.Format == NV12) {
+                NV12toRGBA(pBuf, format.Width, format.Height, format.Stride, pDest);
+            } else if (format.Format = YUY2) {
+                YUY2toRGBA(pBuf, format.Width, format.Height, format.Stride, pDest);
+            }
+
+            if (customRenderCb)
+                customRenderCb(pDest, format);
+
+            delete[] pDest;
+        });
+
         res = StartStreaming(mPreviewPinIndex);
 
     } while (0);

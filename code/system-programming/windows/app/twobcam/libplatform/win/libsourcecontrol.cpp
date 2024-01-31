@@ -281,6 +281,10 @@ HRESULT MediaSourceControl::GetAvaliableMediaFormat(
 	CComPtr<IMFMediaType> pMFMediaType = nullptr;
 	GUID subtype = GUID_NULL;
 	HRESULT res = S_OK;
+	UINT32 width = 0;
+	UINT32 height = 0;
+	UINT32 numerator = 0;
+	UINT32 denominator = 0;
 
 	std::shared_lock<std::shared_mutex> rlock(mMutex);
 	res = mpSourceReader->GetNativeMediaType(streamIndex, typeIndex, &pMFMediaType);
@@ -295,11 +299,19 @@ HRESULT MediaSourceControl::GetAvaliableMediaFormat(
 	if (FAILED(res))
 		return res;
 
-	res = MFGetAttributeSize(pMFMediaType, MF_MT_FRAME_SIZE, &mediaType.Width, &mediaType.Height);
+	res = MFGetAttributeSize(pMFMediaType, MF_MT_FRAME_SIZE, &width, &height);
 	if (FAILED(res))
 		return res;
 
-	res = MFGetAttributeSize(pMFMediaType, MF_MT_FRAME_RATE, &mediaType.FrameNumerator, &mediaType.FrameDenominator);
+	mediaType.Width = width;
+	mediaType.Height = height;
+
+
+	res = MFGetAttributeSize(pMFMediaType, MF_MT_FRAME_RATE, &numerator, &denominator);
+
+	mediaType.FrameNumerator = numerator;
+	mediaType.FrameDenominator = denominator;
+
 	return res;
 }
 
@@ -311,6 +323,8 @@ HRESULT MediaSourceControl::GetCurrentMediaFormat(
 	HRESULT res = S_OK;
 	CComPtr<IMFMediaType> pMFMediaType = nullptr;
 	GUID subtype = GUID_NULL;
+	UINT32 height = 0;
+	UINT32 width = 0;
 
 	if (!mpSourceReader)
 		return E_UNEXPECTED;
@@ -328,7 +342,11 @@ HRESULT MediaSourceControl::GetCurrentMediaFormat(
 	if (FAILED(res))
 		return res;
 
-	return MFGetAttributeSize(pMFMediaType, MF_MT_FRAME_SIZE, &mediaType.Width, &mediaType.Height);
+	res = MFGetAttributeSize(pMFMediaType, MF_MT_FRAME_SIZE, &width, &height);
+	mediaType.Width = width;
+	mediaType.Height = height;
+
+	return res;
 }
 
 HRESULT MediaSourceControl::GetCurrentMediaType(

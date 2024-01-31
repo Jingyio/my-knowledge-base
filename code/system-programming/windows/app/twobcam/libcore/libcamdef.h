@@ -1,13 +1,15 @@
 #ifndef _LIBCAMDEF_H_
 #define _LIBCAMDEF_H_
 
+#include <stdint.h>
+
 #ifdef LIBCAM_EXPORTS
 #define LIBCAM_API __declspec(dllexport)
 #else
 #define LIBCAM_API __declspec(dllimport)
 #endif
 
-typedef enum LIBCAM_API {
+typedef enum LIBCAM_API : uint64_t {
     OK = 0,
     INVALID_HANDLE,
     INVALID_PARAM,
@@ -15,7 +17,7 @@ typedef enum LIBCAM_API {
     Error,
 } ErrorCode;
 
-typedef enum LIBCAM_API {
+typedef enum LIBCAM_API : uint64_t {
     RGB8,
     RGB24,
     RGB32,
@@ -26,20 +28,20 @@ typedef enum LIBCAM_API {
 
 typedef struct LIBCAM_API {
     VideoFormat  Format;
-    unsigned int Width;
-    unsigned int Height;
-    long         Stride;
-    unsigned int FrameNumerator;
-    unsigned int FrameDenominator;
+    uint64_t     Width;
+    uint64_t     Height;
+    int64_t      Stride;
+    uint64_t     FrameNumerator;
+    uint64_t     FrameDenominator;
 } MediaFormat;
 
-typedef LIBCAM_API enum {
+typedef LIBCAM_API enum : uint64_t {
     PREVIEW = 0,
     RECORD,
     PHOTO,
 } PinType;
 
-typedef LIBCAM_API enum {
+typedef LIBCAM_API enum : uint64_t {
     STOP = 0,
     START,
     TRANSFORM,
@@ -50,7 +52,7 @@ typedef ErrorCode(*PinDataCallback)(void*, int, unsigned char*, MediaFormat);
 
 typedef struct LIBCAM_API _CameraConfig {
     PinType         Type;
-    int             FormatIndex = -1;
+    uint64_t        FormatIndex;
     ActionType      Action;
     RenderCallback  Callback;
     const char*     FilePath;
@@ -61,9 +63,9 @@ typedef struct LIBCAM_API {
     MediaFormat  PreviewFormatArray[MAX_FORMAT_SIZE];
     MediaFormat  RecordFormatArray[MAX_FORMAT_SIZE];
     MediaFormat  PhotoFormatArray[MAX_FORMAT_SIZE];
-    unsigned int PreviewFormatCount;
-    unsigned int RecordFormatCount;
-    unsigned int PhotoFormatCount;
+    uint64_t     PreviewFormatCount;
+    uint64_t     RecordFormatCount;
+    uint64_t     PhotoFormatCount;
     MediaFormat  CurrentPreviewFormat;
     MediaFormat  CurrentRecordFormat;
     MediaFormat  CurrentPhotoFormat;

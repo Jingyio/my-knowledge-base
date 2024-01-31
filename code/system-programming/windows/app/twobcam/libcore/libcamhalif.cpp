@@ -43,6 +43,7 @@ static ErrorCode InfoHandler(CameraHandle handle, CameraInfo& info)
         return INVALID_HANDLE;
 
     NSCAM::ICamCore* pCamCore = ((NSCAM::ICamCore*)handle.Unused);
+    unsigned int count = 0;
 
     memset(info.PreviewFormatArray, 0, MAX_FORMAT_SIZE * sizeof(MediaFormat));
     memset(info.RecordFormatArray, 0, MAX_FORMAT_SIZE * sizeof(MediaFormat));
@@ -59,9 +60,17 @@ static ErrorCode InfoHandler(CameraHandle handle, CameraInfo& info)
         memset(&info.CurrentPhotoFormat, 0, sizeof(MediaFormat));
 
     // Get supported media formats for each pin
-    ErrorCode previewRes = pCamCore->GetSupportedFormat(PREVIEW, info.PreviewFormatArray, &info.PreviewFormatCount);
-    ErrorCode recordRes = pCamCore->GetSupportedFormat(RECORD, info.RecordFormatArray, &info.RecordFormatCount);
-    ErrorCode photoRes = pCamCore->GetSupportedFormat(PHOTO, info.PhotoFormatArray, &info.PhotoFormatCount);
+    ErrorCode previewRes = pCamCore->GetSupportedFormat(PREVIEW, info.PreviewFormatArray, &count);
+    if (previewRes == ErrorCode::OK)
+        info.PreviewFormatCount = count;
+
+    ErrorCode recordRes = pCamCore->GetSupportedFormat(RECORD, info.RecordFormatArray, &count);
+    if (recordRes == ErrorCode::OK)
+        info.RecordFormatCount = count;
+
+    ErrorCode photoRes = pCamCore->GetSupportedFormat(PHOTO, info.PhotoFormatArray, &count);
+    if (photoRes == ErrorCode::OK)
+        info.PhotoFormatCount = count;
 
     if (!previewRes && !recordRes && !photoRes)
         return OK;
