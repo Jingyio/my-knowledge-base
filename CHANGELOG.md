@@ -1,4 +1,4 @@
-#### 2024-01-31
+#### 2024-02-17
 
 ##### Chores
 
@@ -12,8 +12,9 @@
 
 ##### New Features
 
+* **8051-easylib:**  create an easylib project based on 8051 architecture (1204756b)
 * **win-app-twobcam:**
-  *  create a UI project to support render preview data (e76c68b2)
+  *  create a UI project to support render preview data (5cb279f7)
   *  support saving videos with given file names (ddf62cf6)
   *  support video recording (f1363c61)
   *  support getting/setting media formats (8aa9be05)
