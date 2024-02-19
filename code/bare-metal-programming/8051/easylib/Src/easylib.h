@@ -131,5 +131,11 @@ void     uart_send_string   (uint8_t*);
 uint8_t* uart_receive_string(uint32_t);
 #endif
 
+//
+// MCU Mode Workspace
+//
+#ifdef EASYLIB_POWERDOWN_SUPPORT
+void set_power_down_mode(void);
+#endif
 
 #endif

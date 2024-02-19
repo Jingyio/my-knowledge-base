@@ -1,4 +1,4 @@
-#### 2024-02-17
+#### 2024-02-19
 
 ##### Chores
 
@@ -12,7 +12,10 @@
 
 ##### New Features
 
-* **8051-easylib:**  create an easylib project based on 8051 architecture (1204756b)
+* **8051-easylib:**
+  *  support power down mode (fefc01bc)
+  *  add a control macro for interrupt related code (d9910d43)
+  *  create an easylib project based on 8051 architecture (6bab6c52)
 * **win-app-twobcam:**
   *  create a UI project to support render preview data (5cb279f7)
   *  support saving videos with given file names (ddf62cf6)

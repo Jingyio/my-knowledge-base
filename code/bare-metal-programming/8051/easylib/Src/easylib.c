@@ -162,6 +162,7 @@ int configure_timer(int_type_t timer,
 // UART Workspace
 //
 #ifdef EASYLIB_UART_SUPPORT
+
 #define MAX_BAUDRATE_PRESET (5)
 #define RECEIVE_BUFFER_SIZE (32 + 1)
 
@@ -256,5 +257,15 @@ int configure_uart(uint32_t baudrate)
     hook_interrupt_handler(UART, uart_2stage_handler);
     
     return 0;
+}
+#endif
+
+//
+// MCU Mode Workspace
+//
+#ifdef EASYLIB_POWERDOWN_SUPPORT
+void set_power_down_mode(void)
+{
+    PCON |= 0x02;
 }
 #endif

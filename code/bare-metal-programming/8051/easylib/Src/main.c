@@ -5,6 +5,16 @@ sbit led2 = P2^1;
 sbit led3 = P2^2;
 sbit led4 = P2^3;
 
+void delay_ms(uint32_t ms)
+{
+    uint32_t i = 0;
+    uint32_t j = 0;
+    
+    for (i = ms; i > 0; i--)
+        for (j = 110; j > 0; j--)
+            ;
+}
+
 void on_ext0_trigger(void)
 {
     unsigned int i = 0;
@@ -48,6 +58,9 @@ void main(void)
     set_interrupt_state(EXTERNAL0, INT_ON);
     set_interrupt_state(EXTERNAL1, INT_ON);
     set_interrupt_state(TIMER0, INT_ON);
+    
+    delay_ms(5000);
+    set_power_down_mode();
     
     while (1) {
     }
