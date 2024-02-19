@@ -49,11 +49,6 @@ void main(void)
     set_interrupt_state(EXTERNAL1, INT_ON);
     set_interrupt_state(TIMER0, INT_ON);
     
-    configure_uart(9600);
-    set_interrupt_state(UART, INT_ON);
-    
     while (1) {
-        ptr_buf = uart_receive_string(8);
-        uart_send_string(ptr_buf);
     }
 }

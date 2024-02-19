@@ -322,7 +322,7 @@
             <InterruptVectorAddress>0</InterruptVectorAddress>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>EASYLIB_TIMER_SUPPORT,EASYLIB_UART_SUPPORT,EASYLIB_EXTERNAL_INTERRUPT_SUPPORT</Define>
+              <Define>EASYLIB_INTERRUPT_SUPPORT,EASYLIB_EXTERNAL_INTERRUPT_SUPPORT,EASYLIB_TIMER_SUPPORT</Define>
               <Undefine></Undefine>
               <IncludePath></IncludePath>
             </VariousControls>

@@ -20,7 +20,7 @@
 #ifndef __EASYLIB_H_
 #define __EASYLIB_H_
 
-#include <reg52.h>
+#include <reg51.h>
 
 typedef unsigned char  uint8_t;
 typedef unsigned short uint16_t;
@@ -30,8 +30,9 @@ typedef unsigned long  uint32_t;
 #define E_OUT_OF_MEMORY             (-2)
 
 //
-// Common
+// Interrupt Workspace
 //
+#ifdef EASYLIB_INTERRUPT_SUPPORT
 typedef enum interrupt_type {
     TIMER0    = 0x0,
     TIMER1    = 0x1,
@@ -63,9 +64,10 @@ typedef enum interrupt_state {
     } while (0)
     
 int hook_interrupt_handler(int_type_t type, void (*handler)(void));
+#endif
 
 //
-// External Interrupt
+// External Interrupt Workspace
 //
 #ifdef EASYLIB_EXTERNAL_INTERRUPT_SUPPORT
 typedef enum eint_trigger_mode {
@@ -86,7 +88,7 @@ typedef enum eint_trigger_mode {
 #endif
 
 //
-// Timer Interrupt
+// Timer Workspace
 //
 #ifdef EASYLIB_TIMER_SUPPORT
 typedef enum timer_int_mode {
@@ -111,7 +113,7 @@ int configure_timer(int_type_t, uint8_t, uint8_t, uint8_t, uint8_t, void (*)(voi
 #endif
 
 //
-// UART
+// UART Workspace
 //
 #ifdef EASYLIB_UART_SUPPORT
 typedef struct baudrate_preset {

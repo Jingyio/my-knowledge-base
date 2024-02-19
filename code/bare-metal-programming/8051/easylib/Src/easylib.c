@@ -19,8 +19,6 @@
 
 #include "easylib.h"
 
-static uint32_t xdata g_interrupt_handlers[5] = { 0 };
-
 #ifdef EASYLIB_TIMER_SUPPORT
 static uint16_t xdata g_timer_mode_max_count[4] = { 0xff1f, 0xffff, 0x00ff, 0x00ff };
 static uint8_t  xdata g_reload_th0 = 0;
@@ -28,6 +26,12 @@ static uint8_t  xdata g_reload_tl0 = 0;
 static uint8_t  xdata g_reload_th1 = 0;
 static uint8_t  xdata g_reload_tl1 = 0;
 #endif
+
+//
+// Interrupt Workspace
+//
+#ifdef EASYLIB_INTERRUPT_SUPPORT
+static uint32_t xdata g_interrupt_handlers[5] = { 0 };
 
 int hook_interrupt_handler(int_type_t type, void (*handler)(void))
 {
@@ -88,9 +92,13 @@ static void uart_handler(void) interrupt 4
     execute_interrupt_group(UART);
     RI = 0;
 }
+#endif
 
-
+//
+// Timer Workspace
+//
 #ifdef EASYLIB_TIMER_SUPPORT
+
 int configure_timer(int_type_t timer,
                     uint8_t    mode,
                     uint8_t    th,
@@ -150,7 +158,9 @@ int configure_timer(int_type_t timer,
 }
 #endif
 
-
+//
+// UART Workspace
+//
 #ifdef EASYLIB_UART_SUPPORT
 #define MAX_BAUDRATE_PRESET (5)
 #define RECEIVE_BUFFER_SIZE (32 + 1)
