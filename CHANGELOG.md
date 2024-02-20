@@ -1,4 +1,4 @@
-#### 2024-02-19
+#### 2024-02-20
 
 ##### Chores
 
@@ -13,7 +13,8 @@
 ##### New Features
 
 * **8051-easylib:**
-  *  support power down mode (fefc01bc)
+  *  support configuring interrupt priorities (f667b22e)
+  *  support power down mode (930cb3e4)
   *  add a control macro for interrupt related code (d9910d43)
   *  create an easylib project based on 8051 architecture (6bab6c52)
 * **win-app-twobcam:**

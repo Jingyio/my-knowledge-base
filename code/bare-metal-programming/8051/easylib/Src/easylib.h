@@ -20,7 +20,7 @@
 #ifndef __EASYLIB_H_
 #define __EASYLIB_H_
 
-#include <reg51.h>
+#include <reg52.h>
 
 typedef unsigned char  uint8_t;
 typedef unsigned short uint16_t;
@@ -34,10 +34,10 @@ typedef unsigned long  uint32_t;
 //
 #ifdef EASYLIB_INTERRUPT_SUPPORT
 typedef enum interrupt_type {
-    TIMER0    = 0x0,
-    TIMER1    = 0x1,
-    EXTERNAL0 = 0x2,
-    EXTERNAL1 = 0x3,
+    EXTERNAL0 = 0x0,
+    TIMER0    = 0x1,
+    EXTERNAL1 = 0x2,
+    TIMER1    = 0x3,
     UART      = 0x4,
 } int_type_t;
 
@@ -45,6 +45,11 @@ typedef enum interrupt_state {
     INT_OFF = 0,
     INT_ON  = 1,
 } int_state_t;
+
+typedef enum interrupt_prioriy {
+    LEVEL_0 = 0,    // lowest
+    LEVEL_1 = 1,    // highest
+} int_prioriy_t;
 
 #define EXTERNAL0_INT_OFF           (EX0=0)
 #define EXTERNAL0_INT_ON            (EX0=1)
@@ -64,6 +69,7 @@ typedef enum interrupt_state {
     } while (0)
     
 int hook_interrupt_handler(int_type_t type, void (*handler)(void));
+int configure_interrupt_priority(int_type_t type, int_prioriy_t priority);
 #endif
 
 //

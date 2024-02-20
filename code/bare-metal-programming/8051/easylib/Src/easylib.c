@@ -43,6 +43,17 @@ int hook_interrupt_handler(int_type_t type, void (*handler)(void))
     return 0;
 }
 
+int configure_interrupt_priority(int_type_t type, int_prioriy_t priority)
+{
+    if (type > UART || priority > LEVEL_1)
+        return E_INVALID_PARAM;
+    
+    IP  &= ~((uint8_t)(0x1 << type));
+    IP  |= (uint8_t)(((priority) & 0x1) << type);
+    
+    return 0;
+}
+
 static void execute_interrupt_group(uint8_t offset) reentrant
 {
     if (g_interrupt_handlers[offset] == 0)

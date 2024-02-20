@@ -55,6 +55,10 @@ void main(void)
     configure_exint(EXTERNAL1, TRIGGER_FALLING, on_ext1_trigger);
     configure_timer(TIMER0, 1, 0x4C, 0x00, 1, on_timer0_trigger);
     
+    configure_interrupt_priority(EXTERNAL0, LEVEL_1);
+    configure_interrupt_priority(EXTERNAL1, LEVEL_1);
+    configure_interrupt_priority(TIMER0, LEVEL_1);
+    
     set_interrupt_state(EXTERNAL0, INT_ON);
     set_interrupt_state(EXTERNAL1, INT_ON);
     set_interrupt_state(TIMER0, INT_ON);
