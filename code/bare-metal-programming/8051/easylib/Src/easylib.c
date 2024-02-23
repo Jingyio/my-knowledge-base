@@ -114,7 +114,7 @@ int configure_timer(int_type_t timer,
                     uint8_t    mode,
                     uint8_t    th,
                     uint8_t    tl,
-                    uint8_t    enable_interrupr,
+                    uint8_t    checked,
                     void (*handler)(void))
 {
     if (timer != TIMER0 && timer != TIMER1)
@@ -122,6 +122,13 @@ int configure_timer(int_type_t timer,
     if (mode >= 4)
         return E_INVALID_PARAM;
     
+    // The timer 1 does not count in Mode 3.
+    if (timer == TIMER1 && mode == 3)
+        return E_NOT_IMPLEMENTED;
+
+    if (handler)
+        hook_interrupt_handler(timer, handler);
+        
     if (timer == TIMER0) {
         if (!th && !tl) {
             calculate_reload_value(g_timer_mode_max_count[mode],
@@ -136,13 +143,7 @@ int configure_timer(int_type_t timer,
         TMOD |= mode;
         TH0 = g_reload_th0;
         TL0 = g_reload_tl0;
-        if (enable_interrupr) {
-            ET0 = 1;
-            hook_interrupt_handler(timer, handler);
-        } else {
-            ET0 = 0;
-        }
-        
+        TR0 = checked == 0 ? 0 : 1;
     } else {
         if (!th && !tl) {
             calculate_reload_value(g_timer_mode_max_count[mode],
@@ -157,12 +158,7 @@ int configure_timer(int_type_t timer,
         TMOD |= (mode << 4);
         TH1 = g_reload_th1;
         TL1 = g_reload_tl1;
-        if (enable_interrupr) {
-            ET1 = 1;
-            hook_interrupt_handler(timer, handler);
-        } else {
-            ET1 = 0;
-        }
+        TR1 = checked == 0 ? 0 : 1;
     }
     
     return 0;

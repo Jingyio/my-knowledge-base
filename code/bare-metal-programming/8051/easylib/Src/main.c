@@ -47,13 +47,26 @@ void on_timer0_trigger(void)
     }
 }
 
+void on_timer1_trigger(void)
+{
+    static unsigned int i = 0;
+    
+    if (i < 20) {
+        i += 1;
+    } else {
+        i = 0;
+        led4 = !led4;
+    }
+}
+
 void main(void)
 {
     uint8_t *ptr_buf = 0;
     
     configure_exint(EXTERNAL0, TRIGGER_LEVEL, on_ext0_trigger);
     configure_exint(EXTERNAL1, TRIGGER_FALLING, on_ext1_trigger);
-    configure_timer(TIMER0, 1, 0x4C, 0x00, 1, on_timer0_trigger);
+    configure_timer(TIMER0, 1, 0, 0, 1, on_timer0_trigger);
+    configure_timer(TIMER1, 1, 0, 0, 1, on_timer1_trigger);
     
     configure_interrupt_priority(EXTERNAL0, LEVEL_1);
     configure_interrupt_priority(EXTERNAL1, LEVEL_1);
@@ -62,6 +75,7 @@ void main(void)
     set_interrupt_state(EXTERNAL0, INT_ON);
     set_interrupt_state(EXTERNAL1, INT_ON);
     set_interrupt_state(TIMER0, INT_ON);
+    set_interrupt_state(TIMER1, INT_ON);
     
     delay_ms(5000);
     set_power_down_mode();

@@ -28,6 +28,7 @@ typedef unsigned long  uint32_t;
 
 #define E_INVALID_PARAM             (-1)
 #define E_OUT_OF_MEMORY             (-2)
+#define E_NOT_IMPLEMENTED           (-3)
 
 //
 // Interrupt Workspace
@@ -53,12 +54,12 @@ typedef enum interrupt_prioriy {
 
 #define EXTERNAL0_INT_OFF           (EX0=0)
 #define EXTERNAL0_INT_ON            (EX0=1)
-#define TIMER0_INT_OFF              (TR0=0)
-#define TIMER0_INT_ON               (TR0=1)
+#define TIMER0_INT_OFF              (ET0=0)
+#define TIMER0_INT_ON               (ET0=1)
 #define EXTERNAL1_INT_OFF           (EX1=0)
 #define EXTERNAL1_INT_ON            (EX1=1)
-#define TIMER1_INT_OFF              (TR1=0)
-#define TIMER1_INT_ON               (TR1=1)
+#define TIMER1_INT_OFF              (ET1=0)
+#define TIMER1_INT_ON               (ET1=1)
 #define UART_INT_OFF                (ES=0)
 #define UART_INT_ON                 (ES=1)
 

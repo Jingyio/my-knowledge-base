@@ -1,4 +1,4 @@
-#### 2024-02-20
+#### 2024-02-23
 
 ##### Chores
 
@@ -13,7 +13,7 @@
 ##### New Features
 
 * **8051-easylib:**
-  *  support configuring interrupt priorities (f667b22e)
+  *  support configuring interrupt priorities (b1cb1560)
   *  support power down mode (930cb3e4)
   *  add a control macro for interrupt related code (d9910d43)
   *  create an easylib project based on 8051 architecture (6bab6c52)
@@ -29,5 +29,6 @@
 
 ##### Bug Fixes
 
+* **8051-easylib:**  resolve the issue of improper use of timer registers (7421a886)
 * **win-app-twobcam:**  OS decouple (31889dbf)
 
