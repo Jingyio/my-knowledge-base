@@ -1,8 +1,9 @@
-#### 2024-02-23
+#### 2024-03-03
 
 ##### Chores
 
 * **all:**
+  *  reorganize file locations (690c76f3)
   *  reorganize file locations (d21e078f)
   *  reorganize file locations (23d10b3e)
 
@@ -29,6 +30,6 @@
 
 ##### Bug Fixes
 
-* **8051-easylib:**  resolve the issue of improper use of timer registers (7421a886)
+* **8051-easylib:**  resolve the issue of improper use of timer registers (d8a0a42a)
 * **win-app-twobcam:**  OS decouple (31889dbf)
 
