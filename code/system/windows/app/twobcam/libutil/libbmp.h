@@ -1,5 +1,5 @@
-#ifndef _LIBPHOTOSINK_H_
-#define _LIBPHOTOSINK_H_
+#ifndef _LIBBMP_H_
+#define _LIBBMP_H_
 
 #include <stdint.h>
 #include <string>
@@ -46,20 +46,6 @@ private:
     std::string  mFileName;
     std::fstream mFileStream;
     uint32_t     mDataCount;
-};
-
-class PhotoSink {
-public:
-    explicit PhotoSink(std::string);
-    ~PhotoSink(void) = default;
-
-    void LoadDataFromRGBA(unsigned char*, unsigned int, unsigned int);
-    void LoadDataFromYUY2(unsigned char*, unsigned int, unsigned int);
-    void LoadDataFromNV12(unsigned char*, unsigned int, unsigned int);
-    void SaveFile(unsigned int, unsigned int);
-
-private:
-    Bmp mBmp;
 };
 
 #endif

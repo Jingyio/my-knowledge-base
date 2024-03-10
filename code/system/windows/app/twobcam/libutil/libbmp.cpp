@@ -1,4 +1,4 @@
-#include "libphotosink.h"
+#include "libbmp.h"
 #include "libformatconverter.h"
 #include <iostream>
 
@@ -188,48 +188,4 @@ void Bmp::Close(void)
 {
     if (mFileStream.is_open())
         mFileStream.close();
-}
-
-PhotoSink::PhotoSink(std::string fileName)
-    : mBmp("")
-{
-    mBmp.CreateFile(fileName);
-}
-
-void PhotoSink::LoadDataFromRGBA(unsigned char* pBuf, unsigned int width, unsigned int height)
-{
-    pBuf += width * height * 4;
-    pBuf -= width * 4;
-
-    for (unsigned int i = 0; i < height; i++) {
-        for (unsigned int j = 0; j < width; j++) {
-            unsigned char r = pBuf[0];
-            unsigned char g = pBuf[1];
-            unsigned char b = pBuf[2];
-            unsigned char a = pBuf[3];
-
-            pBuf += 4;
-
-            mBmp << r;
-            mBmp << g;
-            mBmp << b;
-        }
-        pBuf -= width * 4 * 2;
-    }
-}
-
-void PhotoSink::LoadDataFromYUY2(unsigned char* pBuf, unsigned int width, unsigned int height)
-{
-
-}
-
-void PhotoSink::LoadDataFromNV12(unsigned char* pBuf, unsigned int width, unsigned int height)
-{
-
-}
-
-void PhotoSink::SaveFile(unsigned int width, unsigned int height)
-{
-    mBmp.Save(width, height);
-    mBmp.Close();
 }

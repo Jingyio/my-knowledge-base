@@ -13,27 +13,24 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\sinks">
+      <UniqueIdentifier>{3631493c-b86b-413e-9f6b-d4fca462d5a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\utils">
+      <UniqueIdentifier>{76e117ff-fbd5-4be1-9b9d-967f663a7018}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\libcore\libformatconverter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\libcore\libcamhalif.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\libcore\liblog.h">
+    <ClInclude Include="..\..\libplatform\win\libmfcore.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\libcore\libphotosink.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libplatform\win\libcamcore.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libplatform\win\libsourcecontrol.h">
+    <ClInclude Include="..\..\libplatform\win\libmfsource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libcore\libcamcoreif.h">
@@ -42,7 +39,25 @@
     <ClInclude Include="..\..\libcore\libcamdef.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\libplatform\win\libcamvideosink.h">
+    <ClInclude Include="..\..\libplatform\win\libmfvideosink.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libutil\libformatconverter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libutil\liblog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libutil\libbmp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libplatform\win\libsinkdevice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libplatform\win\libmfphotosink.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libplatform\win\libmfpreviewsink.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -50,26 +65,32 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libcore\libformatconverter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\libcore\libcamhalif.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libcore\liblog.cpp">
+    <ClCompile Include="..\..\libplatform\win\libmfcore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libcore\libphotosink.cpp">
+    <ClCompile Include="..\..\libplatform\win\libmfsource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libplatform\win\libcamcore.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\libplatform\win\libmfvideosink.cpp">
+      <Filter>Source Files\sinks</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libplatform\win\libsourcecontrol.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\libutil\libformatconverter.cpp">
+      <Filter>Source Files\utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libplatform\win\libcamvideosink.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\libutil\liblog.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libutil\libbmp.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libplatform\win\libmfphotosink.cpp">
+      <Filter>Source Files\sinks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libplatform\win\libmfpreviewsink.cpp">
+      <Filter>Source Files\sinks</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

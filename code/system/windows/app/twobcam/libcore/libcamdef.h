@@ -13,6 +13,7 @@ typedef enum LIBCAM_API : uint64_t {
     OK = 0,
     INVALID_HANDLE,
     INVALID_PARAM,
+    INVALID_REQUEST,
     UNINITIALIZED,
     Error,
 } ErrorCode;
@@ -48,12 +49,11 @@ typedef LIBCAM_API enum : uint64_t {
 } ActionType;
 
 typedef void LIBCAM_API(*RenderCallback)(unsigned char*, MediaFormat);
-typedef ErrorCode(*PinDataCallback)(void*, int, unsigned char*, MediaFormat);
 
 typedef struct LIBCAM_API _CameraConfig {
     PinType         Type;
-    uint64_t        FormatIndex;
     ActionType      Action;
+    int64_t         FormatIndex;
     RenderCallback  Callback;
     const char*     FilePath;
 } CameraConfig;

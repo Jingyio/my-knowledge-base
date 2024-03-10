@@ -17,7 +17,7 @@ public:
     virtual ErrorCode StopRecord        (void)                                  = 0;
     virtual ErrorCode GetSupportedFormat(PinType, MediaFormat*, unsigned int*)  = 0;
     virtual ErrorCode GetCurrentFormat  (PinType, MediaFormat*)                 = 0;
-    virtual ErrorCode SetCurrentFormat  (PinType, unsigned int)                 = 0;
+    virtual ErrorCode SetCurrentFormat  (PinType, unsigned long long)           = 0;
 };
 }
 

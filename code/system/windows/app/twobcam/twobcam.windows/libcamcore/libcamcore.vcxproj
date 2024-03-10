@@ -97,6 +97,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\libcore;$(SolutionDir)..\libutil;$(SolutionDir)..\libplatform\win;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -115,6 +116,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\libcore;$(SolutionDir)..\libutil;$(SolutionDir)..\libplatform\win;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -133,6 +135,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\libcore;$(SolutionDir)..\libutil;$(SolutionDir)..\libplatform\win;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -151,6 +154,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\libcore;$(SolutionDir)..\libutil;$(SolutionDir)..\libplatform\win;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -163,23 +167,28 @@
   <ItemGroup>
     <ClInclude Include="..\..\libcore\libcamcoreif.h" />
     <ClInclude Include="..\..\libcore\libcamdef.h" />
-    <ClInclude Include="..\..\libcore\libformatconverter.h" />
     <ClInclude Include="..\..\libcore\libcamhalif.h" />
-    <ClInclude Include="..\..\libcore\liblog.h" />
-    <ClInclude Include="..\..\libcore\libphotosink.h" />
-    <ClInclude Include="..\..\libplatform\win\libcamcore.h" />
-    <ClInclude Include="..\..\libplatform\win\libcamvideosink.h" />
-    <ClInclude Include="..\..\libplatform\win\libsourcecontrol.h" />
+    <ClInclude Include="..\..\libplatform\win\libmfcore.h" />
+    <ClInclude Include="..\..\libplatform\win\libmfphotosink.h" />
+    <ClInclude Include="..\..\libplatform\win\libmfpreviewsink.h" />
+    <ClInclude Include="..\..\libplatform\win\libmfvideosink.h" />
+    <ClInclude Include="..\..\libplatform\win\libmfsource.h" />
+    <ClInclude Include="..\..\libplatform\win\libsinkdevice.h" />
+    <ClInclude Include="..\..\libutil\libformatconverter.h" />
+    <ClInclude Include="..\..\libutil\liblog.h" />
+    <ClInclude Include="..\..\libutil\libbmp.h" />
     <ClInclude Include="framework.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\libcore\libformatconverter.cpp" />
     <ClCompile Include="..\..\libcore\libcamhalif.cpp" />
-    <ClCompile Include="..\..\libcore\liblog.cpp" />
-    <ClCompile Include="..\..\libcore\libphotosink.cpp" />
-    <ClCompile Include="..\..\libplatform\win\libcamcore.cpp" />
-    <ClCompile Include="..\..\libplatform\win\libcamvideosink.cpp" />
-    <ClCompile Include="..\..\libplatform\win\libsourcecontrol.cpp" />
+    <ClCompile Include="..\..\libplatform\win\libmfcore.cpp" />
+    <ClCompile Include="..\..\libplatform\win\libmfphotosink.cpp" />
+    <ClCompile Include="..\..\libplatform\win\libmfpreviewsink.cpp" />
+    <ClCompile Include="..\..\libplatform\win\libmfvideosink.cpp" />
+    <ClCompile Include="..\..\libplatform\win\libmfsource.cpp" />
+    <ClCompile Include="..\..\libutil\libformatconverter.cpp" />
+    <ClCompile Include="..\..\libutil\liblog.cpp" />
+    <ClCompile Include="..\..\libutil\libbmp.cpp" />
     <ClCompile Include="dllmain.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

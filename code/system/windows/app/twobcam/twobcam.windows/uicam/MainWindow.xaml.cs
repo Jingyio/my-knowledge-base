@@ -22,24 +22,54 @@ namespace uicam
         public MainWindow()
         {
             InitializeComponent();
-            mCB = DrawPreview;
+            int opt = 2;
 
-
-            CameraDll cameraDll = new CameraDll();
-            UInt32 cameraCount = cameraDll.GetCameraCount();
-
-            CameraDll.CameraInfo info = new CameraDll.CameraInfo();
-            cameraDll.OpenCamera(0);
-            cameraDll.QueryCameraInfo(0, ref info);
-
-            CameraDll.CameraConfig config = new CameraDll.CameraConfig()
+            // Preview test
+            if (opt == 0)
             {
-                Type = 0,
-                FormatIndex = 2,
-                Action = 1,
-                Callback = mCB,
-            };
-            cameraDll.ConfigureCamera(0, config);
+                mCB = DrawPreview;
+
+                CameraDll cameraDll = new CameraDll();
+                UInt32 cameraCount = cameraDll.GetCameraCount();
+
+                CameraDll.CameraInfo info = new CameraDll.CameraInfo();
+                cameraDll.OpenCamera(0);
+                cameraDll.QueryCameraInfo(0, ref info);
+
+                CameraDll.CameraConfig config = new CameraDll.CameraConfig()
+                {
+                    Type = 0,
+                    FormatIndex = 2,
+                    Action = 1,
+                    Callback = mCB,
+                };
+                cameraDll.ConfigureCamera(0, config);
+            }
+            else if (opt == 1)
+            {
+
+            }
+            else if (opt == 2)
+            {
+                CameraDll cameraDll = new CameraDll();
+
+                UInt32 cameraCount = cameraDll.GetCameraCount();
+                if (cameraCount == 0)
+                    return;
+
+                CameraDll.CameraInfo info = new CameraDll.CameraInfo();
+                cameraDll.OpenCamera(0);
+                cameraDll.QueryCameraInfo(0, ref info);
+
+                CameraDll.CameraConfig config = new CameraDll.CameraConfig()
+                {
+                    Type = 2,
+                    FormatIndex = 2,
+                    Action = 1,
+                };
+                cameraDll.ConfigureCamera(0, config);
+            }
+
 
             //cameraDll.CloseCamera(0);
         }

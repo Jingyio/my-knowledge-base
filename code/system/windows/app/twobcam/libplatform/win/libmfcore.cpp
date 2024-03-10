@@ -1,11 +1,18 @@
-#include "libcamcore.h"
-#include "libsourcecontrol.h"
-#include "../../libcore/liblog.h"
-#include "../../libcore/libformatconverter.h"
+#include "libmfcore.h"
+#include "libmfsource.h"
+#include "liblog.h"
+#include "libformatconverter.h"
+#include <thread>
 
 namespace NSCAM {
 
-std::mutex sMutex;
+std::mutex                  sMutex;
+std::mutex                  CamCore::sEventMutex;
+bool                        CamCore::sIsEventLooping = true;
+std::condition_variable     CamCore::sCV;
+std::queue<CamCore::Event>  CamCore::sEvents;
+
+
 ICamCore* ICamCore::CreateInstance(unsigned int cameraIndex)
 {
     std::lock_guard<std::mutex> lock(sMutex);
@@ -23,23 +30,29 @@ ErrorCode ICamCore::GetCameraCount(unsigned int* pCount)
     if (FAILED(result)) {
         *pCount = 0;
         return Error;
-    } else {
-        return OK;
     }
+
+    return OK;
 }
 
 CamCore::CamCore(unsigned int cameraIndex)
     : mPreviewPinIndex(-1)
     , mPhotoPinIndex(-1)
     , mRecordPinIndex(-1)
-    , mIsTakingPhoto(false)
+    , mEventLoopThread()
 {
     Initialize(cameraIndex);
+    mEventLoopThread = std::thread(&CamCore::EventLoop, this);
 }
 
 CamCore::~CamCore(void)
 {
+    if (mEventLoopThread.joinable()) {
+        sIsEventLooping = false;
+        CamCore::sCV.notify_all();
 
+        mEventLoopThread.join();
+    }
 }
 
 ErrorCode CamCore::Initialize(unsigned int cameraIndex)
@@ -55,10 +68,6 @@ ErrorCode CamCore::Initialize(unsigned int cameraIndex)
     mpMediaSourceControl = MediaSourceControl::CreateInstance(cameraIndex);
     if (mpMediaSourceControl == nullptr)
         return INVALID_PARAM;
-
-    res = mpMediaSourceControl->SetPinDataCallback(this, CamCoreHelper::OnDataArrived);
-    if (FAILED(res))
-        return Error;
 
     res = mpMediaSourceControl->SetPinSampleCallback(this, CamCoreHelper::OnSampleArrived);
     if (FAILED(res))
@@ -107,42 +116,36 @@ ErrorCode CamCore::Initialize(unsigned int cameraIndex)
 ErrorCode CamCore::Release(void)
 {
     if (mpMediaSourceControl) {
-        mpMediaSourceControl->ClearPinDataCallback(this);
         mpMediaSourceControl->ClearPinSampleCallback(this);
     }
 
     return OK;
 }
 
-static RenderCallback customRenderCb = nullptr;
 ErrorCode CamCore::StartPreview(RenderCallback cb)
 {
     ErrorCode res = OK;
-
-    // FIXME: Need to support multi-channel preview
-    customRenderCb = cb;
+    MediaFormat format{};
 
     do {
-        // Register render callback
-        RegisterRenderCallback(&mPreviewPinIndex,
-                               mPreviewPinIndex,
-                               [](unsigned char* pBuf, MediaFormat format) -> void {
-
-            unsigned char* pDest = new unsigned char[4 * 2000 * 2000];
-
-            if (format.Format == NV12) {
-                NV12toRGBA(pBuf, format.Width, format.Height, format.Stride, pDest);
-            } else if (format.Format = YUY2) {
-                YUY2toRGBA(pBuf, format.Width, format.Height, format.Stride, pDest);
-            }
-
-            if (customRenderCb)
-                customRenderCb(pDest, format);
-
-            delete[] pDest;
-        });
-
         res = StartStreaming(mPreviewPinIndex);
+        if (res != ErrorCode::OK)
+            break;
+
+        {
+            std::lock_guard<std::mutex> lock(mMutex);
+            mpPreivewSinker = nullptr;
+            mpPreivewSinker = std::make_shared<PreviewSinkDevice>(mPreviewPinIndex);
+
+            if (!mpPreivewSinker)
+                break;
+        }
+
+        if (GetCurrentFormat(PHOTO, &format) == ErrorCode::OK) {
+            res = SUCCEEDED(mpPreivewSinker->Start(cb, format)) ?
+                            ErrorCode::OK :
+                            ErrorCode::Error;
+        }
 
     } while (0);
 
@@ -151,41 +154,35 @@ ErrorCode CamCore::StartPreview(RenderCallback cb)
 
 ErrorCode CamCore::StopPreview(void)
 {
-    UnregisterRenderCallback(&mPreviewPinIndex, mPreviewPinIndex);
+    if (mpPreivewSinker)
+        mpPreivewSinker->Stop();
+
     return StopStreaming(mPreviewPinIndex);
 }
 
-static const char* sFileName = nullptr;
 ErrorCode CamCore::TakePhoto(const char* fileName)
 {
     ErrorCode ret = OK;
-    sFileName = fileName;
+    MediaFormat format;
 
     do {
-        RegisterRenderCallback(&mPhotoPinIndex,
-                               mPhotoPinIndex,
-                               [](unsigned char* pBuf, MediaFormat format) -> void {
-            if (!sFileName)
-                sFileName = "unnamed.bmp";
+        {
+            std::lock_guard<std::mutex> lock(mMutex);
+            mpPhotoSinker = nullptr;
+            mpPhotoSinker = std::make_shared<PhotoSinkDevice>(mPhotoPinIndex);
 
-            PhotoSink sink(sFileName);
-            unsigned char* pDest = new unsigned char[4 * 2000 * 2000];
+            if (!mpPhotoSinker)
+                break;
+        }
 
-            if (format.Format == NV12) {
-                NV12toRGBA(pBuf, format.Width, format.Height, format.Stride, pDest);
-            } else if (format.Format = YUY2) {
-                YUY2toRGBA(pBuf, format.Width, format.Height, format.Stride, pDest);
-            }
-
-            sink.LoadDataFromRGBA(pDest, format.Width, format.Height);
-            sink.SaveFile(format.Width, format.Height);
-
-            sFileName = nullptr;
-            delete[] pDest;
-        });
-
-        mIsTakingPhoto = true;
         StartStreaming(mPhotoPinIndex);
+
+        if (GetCurrentFormat(PHOTO, &format) == ErrorCode::OK) {
+            ret = SUCCEEDED(mpPhotoSinker->TakePhoto(fileName, format)) ?
+                            ErrorCode::OK :
+                            ErrorCode::Error;
+        }
+
     } while (0);
 
     TRACE_AND_RETURN(ret);
@@ -201,7 +198,7 @@ ErrorCode CamCore::StartRecord(const char* pFileName)
     {
         std::lock_guard<std::mutex> lock(mMutex);
         mpViderSinker = nullptr;
-        mpViderSinker = std::make_shared<VideoSinker>();
+        mpViderSinker = std::make_shared<VideoSinkDevice>(mRecordPinIndex);
     }
 
     if (mpViderSinker) {
@@ -214,22 +211,9 @@ ErrorCode CamCore::StartRecord(const char* pFileName)
         if (FAILED(result))
             return ErrorCode::Error;
 
-        if (pFileName) {
-            int length = MultiByteToWideChar(CP_UTF8, 0, pFileName, -1, NULL, 0);
-            wchar_t* pWideString = (wchar_t*)malloc(length * sizeof(wchar_t));
+        result = mpViderSinker->Start(pFileName, pMediaType);    }
 
-            MultiByteToWideChar(CP_UTF8, 0, pFileName, -1, pWideString, length);
-            if (pWideString)
-                mpViderSinker->Start(pWideString, pMediaType) == S_OK ? ErrorCode::OK : ErrorCode::Error;
-            free(pWideString);
-        } else {
-            mpViderSinker->Start(L"unamed.wmv", pMediaType) == S_OK ? ErrorCode::OK : ErrorCode::Error;
-        }
-
-        mIsRecording = true;
-    }
-
-    return ErrorCode::OK;
+    return SUCCEEDED(result) ? ErrorCode::OK : ErrorCode::Error;
 }
 
 ErrorCode CamCore::StopRecord(void)
@@ -240,12 +224,8 @@ ErrorCode CamCore::StopRecord(void)
         return ErrorCode::OK;
 
     result = mpViderSinker->Stop();
-    if (SUCCEEDED(result)) {
-        std::lock_guard<std::mutex> lock(mMutex);
-        mIsRecording = false;
-    }
-
     StopStreaming(mRecordPinIndex);
+
     return ErrorCode::OK;
 }
 
@@ -314,7 +294,7 @@ ErrorCode CamCore::GetCurrentFormat(PinType pinType, MediaFormat* pFormat)
         return ErrorCode::Error;
 }
 
-ErrorCode CamCore::SetCurrentFormat(PinType pinType, unsigned int typeIndex)
+ErrorCode CamCore::SetCurrentFormat(PinType pinType, unsigned long long typeIndex)
 {
     DWORD pin = 0;
 
@@ -337,7 +317,10 @@ ErrorCode CamCore::SetCurrentFormat(PinType pinType, unsigned int typeIndex)
         break;
     }
 
-    if (SUCCEEDED(mpMediaSourceControl->SetCurrentMediaFormat(pin, typeIndex)))
+    if (mWorkingStreamRefCountMapper.count(pin) != 0)
+        return ErrorCode::INVALID_REQUEST;
+
+    if (SUCCEEDED(mpMediaSourceControl->SetCurrentMediaFormat(pin, (DWORD)typeIndex)))
         return ErrorCode::OK;
     else
         return ErrorCode::Error;
@@ -418,85 +401,58 @@ ErrorCode CamCore::StopStreaming(unsigned int streamIndex)
     TRACE_AND_RETURN(ret);
 }
 
-ErrorCode CamCore::RegisterRenderCallback(void* caller, unsigned int streamIndex, RenderCallback cb)
+void CamCore::EventLoop(void)
 {
-    ErrorCode res = OK;
+    while (CamCore::sIsEventLooping) {
+        std::unique_lock<std::mutex> lock(CamCore::sEventMutex);
+        sCV.wait(lock, []() { return !sEvents.empty() || !CamCore::sIsEventLooping; });
 
-    do {
-        std::lock_guard<std::mutex> lock(mMutex);
+        while (!sEvents.empty()) {
+            auto event = sEvents.front();
+            sEvents.pop();
 
-        if (!caller || streamIndex == -1 || !cb) {
-            res = INVALID_PARAM;
-            break;
-        }
-
-        RenderInfo info = { 0 };
-        info.Caller = caller;
-        info.StreamIndex = streamIndex;
-        info.Callback = cb;
-
-        mRenderInfoList.push_back(info);
-
-    } while (0);
-
-    TRACE_AND_RETURN(res);
-}
-
-ErrorCode CamCore::UnregisterRenderCallback(void* caller, unsigned int streamIndex)
-{
-    ErrorCode res = OK;
-
-    do {
-        std::lock_guard<std::mutex> lock(mMutex);
-
-        if (!caller || streamIndex == -1) {
-            res = INVALID_PARAM;
-            break;
-        }
-
-        for (auto item = mRenderInfoList.begin(); item != mRenderInfoList.end(); ) {
-            if (item->Caller == caller && item->StreamIndex == streamIndex)
-                item = mRenderInfoList.erase(item);
-            else
-                item += 1;
-        }
-
-    } while (0);
-
-    TRACE_AND_RETURN(res);
-}
-
-ErrorCode CamCoreHelper::OnDataArrived(void* caller, int streamIndex, unsigned char* pBuf, MediaFormat format)
-{
-    if (!caller || !pBuf)
-        return ErrorCode::INVALID_PARAM;
-
-    CamCore* pCamCore = static_cast<CamCore*>(caller);
-
-    for (auto& item : pCamCore->mRenderInfoList) {
-        if (item.StreamIndex == streamIndex) {
-            item.Callback(pBuf, format);
+            if (event.Type == CamCore::Event::EventType::START_STREAM) {
+                StartStreaming(event.StreamIndex);
+            } else {
+                StopStreaming(event.StreamIndex);
+            }
         }
     }
-
-    if (streamIndex == pCamCore->mPhotoPinIndex && pCamCore->mIsTakingPhoto) {
-        pCamCore->UnregisterRenderCallback(&pCamCore->mPhotoPinIndex, streamIndex);
-        pCamCore->StopStreaming(pCamCore->mPhotoPinIndex);
-        pCamCore->mIsTakingPhoto = false;
-    }
-
-    return OK;
 }
 
-ErrorCode CamCoreHelper::OnSampleArrived(void* caller, int streamIndex, IMFSample* pSample, LONGLONG timestamp)
+ErrorCode CamCoreHelper::OnSampleArrived(
+    void* caller,
+    DWORD streamIndex,
+    DWORD streamFlags,
+    IMFSample* pSample,
+    LONGLONG timestamp
+)
 {
     if (!caller || !pSample)
         return ErrorCode::INVALID_PARAM;
 
     CamCore* pCamCore = static_cast<CamCore*>(caller);
-    if (streamIndex == pCamCore->mRecordPinIndex && pCamCore->mIsRecording) {
-        pCamCore->mpViderSinker->Write(pSample, timestamp);
+
+    if (pCamCore->mpPreivewSinker)
+        pCamCore->mpPreivewSinker->OnDataCallback(streamIndex, streamFlags, pSample, timestamp);
+
+    if (pCamCore->mpPhotoSinker) {
+        pCamCore->mpPhotoSinker->OnDataCallback(streamIndex, streamFlags, pSample, timestamp);
+
+        if (pCamCore->mpPhotoSinker->IsOneShot()) {
+            CamCore::Event event = {
+                .Type = CamCore::Event::EventType::STOP_STREAM,
+                .StreamIndex = pCamCore->mpPhotoSinker->GetStreamIndex(),
+            };
+            CamCore::sEvents.push(event);
+            CamCore::sCV.notify_one();
+
+            pCamCore->mpPhotoSinker = nullptr;
+        }
     }
+
+    if (pCamCore->mpViderSinker)
+        pCamCore->mpViderSinker->OnDataCallback(streamIndex, streamFlags, pSample, timestamp);
 
     return ErrorCode::OK;
 }

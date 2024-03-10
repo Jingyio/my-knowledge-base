@@ -1,4 +1,4 @@
-#include "libsourcecontrol.h"
+#include "libmfsource.h"
 #include <ks.h>
 #include <ksmedia.h>
 #include <mftransform.h>
@@ -63,7 +63,6 @@ MediaSourceControl::MediaSourceControl(
 	{
 		std::unique_lock<std::shared_mutex> wlock(mMutex);
 		mPinTypeMap.clear();
-		mPinDataCallbackList.clear();
 
 		if (mpDevice) {
 			mpDevice->ActivateObject(IID_PPV_ARGS(&mpMediaSource));
@@ -175,52 +174,15 @@ HRESULT MediaSourceControl::OnReadSample(
 )
 {
 	HRESULT res = S_OK;
-	std::unique_lock<std::shared_mutex> wlock(mMutex);
 
 	do {
-		if (SUCCEEDED(result) && pSample) {
-
-			CComPtr<IMFMediaBuffer> pMFBuffer = nullptr;
-			CComPtr<IMF2DBuffer> p2DBuffer = nullptr;
-			BYTE* pCharBuffer = nullptr;
-			LONG pitch = 0;
-
-			res = pSample->GetBufferByIndex(0, &pMFBuffer);
-			if (SUCCEEDED(res)) {
-				res = pMFBuffer->QueryInterface(IID_PPV_ARGS(&p2DBuffer));
-				if (SUCCEEDED(res) && p2DBuffer) {
-					res = p2DBuffer->Lock2D(&pCharBuffer, &pitch);
-					if (FAILED(res))
-						break;
-				} else {
-					break;
-				}
-			}
-
-			// Process the IMFSample here
-			for (auto& item : mPinDataCallbackList) {
-				if (item.first == nullptr)
-					continue;
-
-				if (item.second) {
-					MediaFormat format = mPinFormatMap[streamIndex];
-					format.Stride = pitch;
-
-					item.second(item.first, streamIndex, pCharBuffer, format);
-				}
-			}
-
-			if (p2DBuffer)
-				p2DBuffer->Unlock2D();
-		}
-
 		if (SUCCEEDED(result) && pSample) {
 			for (auto& item : mPinSampleCallbackList) {
 				if (item.first == nullptr)
 					continue;
 
 				if (item.second) {
-					item.second(item.first, streamIndex, pSample, timestamp);
+					item.second(item.first, streamIndex, streamFlags, pSample, timestamp);
 				}
 			}
 		}
@@ -229,7 +191,12 @@ HRESULT MediaSourceControl::OnReadSample(
 
 	if (SUCCEEDED(result) && mpSourceReader) {
 		if (mWorkingPins.count(streamIndex) != 0)
-			res = mpSourceReader->ReadSample(streamIndex, 0, NULL, NULL, NULL, NULL);
+			res = mpSourceReader->ReadSample(streamIndex,
+											 0,
+											 NULL,
+											 NULL,
+											 NULL,
+											 NULL);
 	}
 
 	return S_OK;
@@ -429,34 +396,7 @@ HRESULT MediaSourceControl::GetStreamState(
 	BOOL& isSelected
 )
 {
-	std::shared_lock<std::shared_mutex> rlock(mMutex);
 	return mpSourceReader->GetStreamSelection(streamIndex, &isSelected);
-}
-
-HRESULT MediaSourceControl::SetPinDataCallback(
-	void* caller,
-	PinDataCallback cb
-)
-{
-	if (!caller || !cb)
-		return E_POINTER;
-
-	bool isFound = false;
-
-	for (auto& item : mPinDataCallbackList) {
-		// If the callback function has already been registered, update it
-		if (item.first == caller) {
-			isFound = true;
-			item.second = cb;
-			break;
-		}
-	}
-
-	if (!isFound) {
-		mPinDataCallbackList.push_back(std::make_pair(caller, cb));
-	}
-
-	return S_OK;
 }
 
 HRESULT MediaSourceControl::SetPinSampleCallback(
@@ -485,21 +425,6 @@ HRESULT MediaSourceControl::SetPinSampleCallback(
 	return S_OK;
 }
 
-HRESULT MediaSourceControl::ClearPinDataCallback(
-	void* caller
-)
-{
-	std::unique_lock<std::shared_mutex> wlock(mMutex);
-
-	for (auto item = mPinDataCallbackList.begin(); item != mPinDataCallbackList.end(); ) {
-		if (item->first == caller)
-			item = mPinDataCallbackList.erase(item);
-		else
-			item += 1;
-	}
-
-	return S_OK;
-}
 
 HRESULT MediaSourceControl::ClearPinSampleCallback(
 	void* caller

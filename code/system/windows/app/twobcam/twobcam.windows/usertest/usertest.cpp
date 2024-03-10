@@ -1,7 +1,7 @@
 #include <iostream>
 #include <format>
 #include <cstdarg>
-#include "../../libCore/liblog.h"
+#include "../../libutil/liblog.h"
 #include "../../libCore/libcamhalif.h"
 #include "../../libCore/libcamdef.h"
 #include <Windows.h>
@@ -19,7 +19,7 @@ void Render(unsigned char* pBuf, MediaFormat type)
     if (sCount >= 30) {
         sCount = 0;
 
-        printf("format: %d, %d X %d\n", type.Format, type.Width, type.Height);
+        printf("format: %lld, %lld X %lld\n", type.Format, type.Width, type.Height);
 
         for (int row = 0; row < 10; row++) {
             for (int col = 0; col < 10; col++) {
@@ -63,7 +63,7 @@ int main()
             //}
 
             for (int i = 0; i < info.PhotoFormatCount; i++) {
-                printf("PHOTO %d: type %d, %d X %d, frame %d\n",
+                printf("PHOTO %d: type %lld, %lld X %lld, frame %lld\n",
                     i,
                     info.PhotoFormatArray[i].Format,
                     info.PhotoFormatArray[i].Width,
@@ -83,17 +83,18 @@ int main()
             //    info.CurrentRecordFormat.Height,
             //    info.CurrentRecordFormat.FrameNumerator / info.CurrentRecordFormat.FrameDenominator);
 
-            //CameraConfig config = {
-            //    .Type  = PREVIEW,
-            //    .Action = START,
-            //    .Callback = Render,
-            //};
-
-            //ret = ConfigureCamera(handle, config);
+            CameraConfig config = {
+                .Type  = PREVIEW,
+                .Action = START,
+                .FormatIndex = -1,
+                .Callback = Render,
+            };
+            ret = ConfigureCamera(handle, config);
 
             CameraConfig config2 = {
                 .Type = PHOTO,
-                .FormatIndex = 2,
+                //.FormatIndex = 2,
+                .FormatIndex = -1,
                 .FilePath = "Suliko.bmp",
             };
             ret = ConfigureCamera(handle, config2);
@@ -105,7 +106,7 @@ int main()
             };
             ret = ConfigureCamera(handle, config3);
 
-            Sleep(5000);
+            Sleep(25000);
 
             CameraConfig config4 = {
                 .Type = RECORD,

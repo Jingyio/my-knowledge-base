@@ -10,7 +10,7 @@ inline unsigned char Clip(int data)
         return data;
 }
 
-ErrorCode YUY2toRGBA(unsigned char* pSrc, unsigned int width, unsigned int height, long stride, unsigned char* pDest)
+ErrorCode YUY2toRGBA(unsigned char* pSrc, unsigned long long width, unsigned long long height, long long stride, unsigned char* pDest)
 {
     if (!pSrc || !pDest)
         return INVALID_PARAM;
@@ -43,7 +43,7 @@ ErrorCode YUY2toRGBA(unsigned char* pSrc, unsigned int width, unsigned int heigh
     return OK;
 }
 
-ErrorCode NV12toRGBA(unsigned char* pSrc, unsigned int width, unsigned int height, long stride, unsigned char* pDest)
+ErrorCode NV12toRGBA(unsigned char* pSrc, unsigned long long width, unsigned long long height, long long stride, unsigned char* pDest)
 {
     if (!pSrc || !pDest)
         return INVALID_PARAM;
