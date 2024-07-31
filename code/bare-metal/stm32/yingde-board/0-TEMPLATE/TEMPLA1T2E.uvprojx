@@ -135,11 +135,11 @@
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
             <Capability>1</Capability>
-            <DriverSelection>-1</DriverSelection>
+            <DriverSelection>4096</DriverSelection>
           </Flash1>
           <bUseTDR>1</bUseTDR>
           <Flash2>BIN\UL2CM3.DLL</Flash2>
-          <Flash3></Flash3>
+          <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -191,7 +191,7 @@
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
-            <useUlib>0</useUlib>
+            <useUlib>1</useUlib>
             <EndSel>0</EndSel>
             <uLtcg>0</uLtcg>
             <nSecure>0</nSecure>
@@ -339,9 +339,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>USE_STDPERIPH_DRIVER</Define>
+              <Define>USE_STDPERIPH_DRIVER,__CC_ARM</Define>
               <Undefine></Undefine>
-              <IncludePath>.\CMSIS;.\FWLIB\inc;.\USER</IncludePath>
+              <IncludePath>.\CMSIS;.\FWLIB\inc;.\USER;.\ULIB;.\HW</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -663,6 +663,136 @@
                   </Aads>
                 </FileArmAds>
               </FileOption>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ULIB</GroupName>
+          <Files>
+            <File>
+              <FileName>ulib_if.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ULIB\ulib_if.h</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_gpio.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ULIB\ulib_gpio.h</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ULIB\ulib_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_def.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ULIB\ulib_def.h</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_assert.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ULIB\ulib_assert.c</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_assert.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ULIB\ulib_assert.h</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_exti.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ULIB\ulib_exti.c</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_exti.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ULIB\ulib_exti.h</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ULIB\ulib_uart.c</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_uart.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ULIB\ulib_uart.h</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ULIB\ulib_i2c.c</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_i2c.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ULIB\ulib_i2c.h</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ULIB\ulib_timer.c</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_timer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ULIB\ulib_timer.h</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ULIB\ulib_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_spi.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ULIB\ulib_spi.h</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_adc_dac.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ULIB\ulib_adc_dac.c</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_adc_dac.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ULIB\ulib_adc_dac.h</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_plat_stm32f103c8t6.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ULIB\ulib_plat_stm32f103c8t6.c</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ULIB\ulib_dma.c</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_dma.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ULIB\ulib_dma.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>HW</GroupName>
+          <Files>
+            <File>
+              <FileName>oled.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\HW\oled.c</FilePath>
+            </File>
+            <File>
+              <FileName>oled.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\HW\oled.h</FilePath>
+            </File>
+            <File>
+              <FileName>oledfont.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\HW\oledfont.h</FilePath>
             </File>
           </Files>
         </Group>

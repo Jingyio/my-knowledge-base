@@ -131,7 +131,7 @@ void PendSV_Handler(void)
   * @param  None
   * @retval None
   */
-__weak void SysTick_Handler(void)
+void SysTick_Handler(void)
 {
 }
 

@@ -1,4 +1,4 @@
-#### 2024-03-10
+#### 2024-07-31
 
 ##### Chores
 
@@ -13,6 +13,10 @@
 
 ##### New Features
 
+* **code/bare-metal/stm32/yingde-board:**
+  *  add example projects (part 2) (ba77894d)
+  *  add example projects (part 1) (2d251058)
+* **design/pcb/yingde:**  create a core board project based on the STM32F103C8T6 microcontroller (ee3f47ff)
 * **code/bare-metal/8051/easylib:**
   *  support configuring interrupt priorities (54fcde06)
   *  support power down mode (0ec470e9)
@@ -35,5 +39,5 @@
 
 ##### Refactors
 
-* **code/system/windows/app/twobcam:**  utilize ISinkDevice for managing render transactions (8f0cf434)
+* **code/system/windows/app/twobcam:**  utilize ISinkDevice for managing render transactions (29821cec)
 

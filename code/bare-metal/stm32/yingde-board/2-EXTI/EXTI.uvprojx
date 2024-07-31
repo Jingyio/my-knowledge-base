@@ -315,7 +315,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>4</Optim>
+            <Optim>3</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -670,14 +670,109 @@
           <GroupName>ULIB</GroupName>
           <Files>
             <File>
+              <FileName>ulib_adc_dac.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ULIB\ulib_adc_dac.c</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_adc_dac.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ULIB\ulib_adc_dac.h</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_assert.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ULIB\ulib_assert.c</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_assert.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ULIB\ulib_assert.h</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_def.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ULIB\ulib_def.h</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ULIB\ulib_dma.c</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_dma.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ULIB\ulib_dma.h</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_exti.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ULIB\ulib_exti.c</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_exti.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ULIB\ulib_exti.h</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ULIB\ulib_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_gpio.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ULIB\ulib_gpio.h</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ULIB\ulib_i2c.c</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_i2c.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ULIB\ulib_i2c.h</FilePath>
+            </File>
+            <File>
               <FileName>ulib_if.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\ULIB\ulib_if.h</FilePath>
             </File>
             <File>
-              <FileName>ulib_plat_stm32f1.c</FileName>
+              <FileName>ulib_plat_stm32f103c8t6.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ULIB\ulib_plat_stm32f1.c</FilePath>
+              <FilePath>.\ULIB\ulib_plat_stm32f103c8t6.c</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ULIB\ulib_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_spi.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ULIB\ulib_spi.h</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ULIB\ulib_timer.c</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_timer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ULIB\ulib_timer.h</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ULIB\ulib_uart.c</FilePath>
+            </File>
+            <File>
+              <FileName>ulib_uart.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ULIB\ulib_uart.h</FilePath>
             </File>
           </Files>
         </Group>

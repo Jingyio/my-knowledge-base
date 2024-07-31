@@ -1,145 +1,67 @@
 #ifndef __ULIB_IF_H__
 #define __ULIB_IF_H__
 
-#include <stdint.h>
+#include "ulib_assert.h"
 
-#define PORT_A      (0)
-#define PORT_B      (1)
-#define PORT_C      (2)
-#define PORT_D      (3)
-#define PORT_E      (4)
-#define PORT_F      (5)
-#define PORT_G      (6)
-#define PIN_HIGH    (1)
-#define PIN_LOW     (0)
+#define ULIB_GPIO_SUPPORT       (0)
+#define ULIB_EXTI_SUPPORT       (1)
+#define ULIB_UART_SUPPORT       (1)
+#define ULIB_DMA_SUPPORT        (0)
+#define ULIB_I2C_SUPPORT        (1)
+#define ULIB_SPI_SUPPORT        (0)
+#define ULIB_TIMER_SUPPORT      (1)
+#define ULIB_ADC_DAC_SUPPORT    (0)
 
-typedef enum {
-    PIN_DIR_DIGITAL_IN = 0,
-    PIN_DIR_DIGITAL_OUT,
-    PIN_DIR_ANALOG_IN,
-    PIN_DIR_ANALIG_OUT,
-} pin_direction_t;
+#if ULIB_EXTI_SUPPORT
+#undef ULIB_GPIO_SUPPORT
+#define ULIB_GPIO_SUPPORT       (1)
+#endif
 
-typedef enum {
-    PIN_MODE_PU,
-    PIN_MODE_PD,
-    PIN_MODE_FLOATING,
-    PIN_MODE_OD,
-    PIN_MODE_PP,
-} pin_mode_t;
+#if ULIB_UART_SUPPORT
+#undef ULIB_GPIO_SUPPORT
+#define ULIB_GPIO_SUPPORT       (1)
+#endif
 
-typedef enum {
-    EXTI_TRIGGER_FALLING = 0x1,
-    EXTI_TRIGGER_RISING  = 0x2,
-} exit_trigger_mode_t;
+#if ULIB_I2C_SUPPORT
+#undef ULIB_GPIO_SUPPORT
+#define ULIB_GPIO_SUPPORT       (1)
+#endif
 
-typedef void (*IRQ_HANDLER)(void);
+#if ULIB_SPI_SUPPORT
+#undef ULIB_GPIO_SUPPORT
+#define ULIB_GPIO_SUPPORT       (1)
+#endif
 
-void ulib_plat_delay_ms(
-    uint32_t ms
-);
+#if ULIB_GPIO_SUPPORT
+#include "ulib_gpio.h"
+#endif
 
-int ulib_plat_pin_init(
-    uint32_t        port,
-    uint32_t        index,
-    pin_direction_t dir,
-    pin_mode_t      mode
-);
+#if ULIB_EXTI_SUPPORT
+#include "ulib_exti.h"
+#endif
 
-int ulib_plat_pin_set(
-    uint32_t        port,
-    uint32_t        index,
-    uint8_t         value
-);
+#if ULIB_UART_SUPPORT
+#include "ulib_uart.h"
+#endif
 
-int ulib_plat_pin_get(
-    uint32_t        port,
-    uint32_t        index,
-    uint8_t*        ptr_value
-);
+#if ULIB_DMA_SUPPORT
+#include "ulib_dma.h"
+#endif
 
-int ulib_plat_exti_init(
-    uint32_t            port,
-    uint32_t            index,
-    exit_trigger_mode_t mode
-);
+#if ULIB_I2C_SUPPORT
+#include "ulib_i2c.h"
+#endif
 
-int ulib_plat_exti_set_handler(
-    uint32_t            port,
-    uint32_t            index,
-    IRQ_HANDLER         handler
-);
+#if ULIB_SPI_SUPPORT
+#include "ulib_spi.h"
+#endif
 
+#if ULIB_TIMER_SUPPORT
+#include "ulib_timer.h"
+#endif
 
-//
-// Common
-//
-#define E_INVALID_PARAMS    (-1)
-#define E_NOT_INITIALIZED   (-2)
-#define E_INVALID_HANDLE    (-3)
-#define E_OOM               (-4)
-#define E_NULL_POINTER      (-5)
-
-static inline void ulib_delay_ms(
-    uint32_t ms
-)
-{
-    ulib_plat_delay_ms(ms);
-}
-
-
-//
-// GPIOs
-//
-
-static inline int ulib_pin_init(
-    uint32_t        port,
-    uint32_t        index,
-    pin_direction_t dir,
-    pin_mode_t      mode
-)
-{
-    return ulib_plat_pin_init(port, index, dir, mode);
-}
-
-static inline int ulib_pin_set(
-    uint32_t        port,
-    uint32_t        index,
-    uint8_t         value
-)
-{
-    return ulib_plat_pin_set(port, index, value);
-}
-
-static inline uint8_t ulib_pin_get(
-    uint32_t        port,
-    uint32_t        index,
-    uint8_t*        ptr_value
-)
-{
-    return ulib_plat_pin_get(port, index, ptr_value);
-}
-
-//
-// External Interrupts
-//
-
-static inline int ulib_exti_init(
-    uint32_t            port,
-    uint32_t            index,
-    exit_trigger_mode_t mode
-)
-{
-    return ulib_plat_exti_init(port, index, mode);
-}
-
-static inline int ulib_exti_set_handler(
-    uint32_t            port,
-    uint32_t            index,
-    IRQ_HANDLER         handler
-)
-{
-    return ulib_plat_exti_set_handler(port, index, handler);
-}
+#if ULIB_ADC_DAC_SUPPORT
+#include "ulib_adc_dac.h"
+#endif
 
 #endif

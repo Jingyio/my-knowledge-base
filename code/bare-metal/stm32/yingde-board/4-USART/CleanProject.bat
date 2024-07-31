@@ -1,6 +1,6 @@
 @echo off
 
-set "match=DebugConfig Listings Objects *.uvguix* *.uvoptx"
+set "match=DebugConfig Listings Objects *.uvguix* *.uvoptx *.scvd"
 
 echo.
 echo =====================================================

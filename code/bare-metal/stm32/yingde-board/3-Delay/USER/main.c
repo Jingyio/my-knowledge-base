@@ -3,15 +3,15 @@
 
 int main(void)
 {   
-    ulib_pin_init(PORT_B, 0, PIN_DIR_DIGITAL_OUT, PIN_MODE_PP);
-    ulib_pin_init(PORT_B, 1, PIN_DIR_DIGITAL_OUT, PIN_MODE_PP);
+    ulib_gpio_init(ULIB_GPIO_PORTB, 0, ULIB_GPIO_DIR_OUT);
+    ulib_gpio_init(ULIB_GPIO_PORTB, 1, ULIB_GPIO_DIR_OUT);
     
     while (1) {
-        ulib_pin_set(PORT_B, 0, 0);
-        ulib_pin_set(PORT_B, 1, 1);
-        ulib_delay_ms(1000);
-        ulib_pin_set(PORT_B, 0, 1);
-        ulib_pin_set(PORT_B, 1, 0);
-        ulib_delay_ms(1000);
+        ulib_gpio_set(ULIB_GPIO_PORTB, 0, 0);
+        ulib_gpio_set(ULIB_GPIO_PORTB, 1, 1);
+        ulib_delay_us(1000000);
+        ulib_gpio_set(ULIB_GPIO_PORTB, 0, 1);
+        ulib_gpio_set(ULIB_GPIO_PORTB, 1, 0);
+        ulib_delay_us(1000000);
     }
 }
